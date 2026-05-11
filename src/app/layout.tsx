@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { CommercialSections } from "@/components/CommercialSections";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
     locale: "es_CL",
     images: [
       {
-        url: "/og-tcdx-compliance.svg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "TCDX Compliance - Gestión ISO simple, trazable y asistida por IA",
@@ -60,14 +61,17 @@ export const metadata: Metadata = {
     title: "TCDX Compliance | Gestión ISO simple, trazable y asistida por IA",
     description:
       "Plataforma SaaS chilena de TECDEX para centralizar controles, evidencias, riesgos, auditorías, planes de acción y reportes ejecutivos para gestión ISO.",
-    images: ["/og-tcdx-compliance.svg"],
+    images: ["/opengraph-image"],
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-CL">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <CommercialSections />
+      </body>
     </html>
   );
 }
