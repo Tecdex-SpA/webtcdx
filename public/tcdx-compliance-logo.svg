@@ -1,3 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="520" height="346" viewBox="0 0 520 346" role="img" aria-label="TCDX Compliance">
-  <image width="520" height="346" href="data:image/png;base64,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"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="210" viewBox="0 0 720 210" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">TCDX Compliance</title>
+  <desc id="desc">Logo TCDX Compliance para fondo oscuro</desc>
+  <defs>
+    <linearGradient id="shieldBlue" x1="115" y1="49" x2="199" y2="166" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/>
+      <stop offset="0.48" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="xGrad" x1="530" y1="70" x2="628" y2="138" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A7F3D0"/>
+      <stop offset="0.45" stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <filter id="glow" x="0" y="0" width="720" height="210" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.219 0 0 0 0 0.741 0 0 0 0 0.973 0 0 0 0.35 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)">
+    <path d="M127 23C103 39 78 43 55 45C57 106 84 151 127 183C171 151 197 106 199 45C176 43 151 39 127 23Z" stroke="white" stroke-opacity="0.72" stroke-width="2"/>
+    <path d="M127 43C108 54 90 58 73 60C78 105 97 136 127 160C158 136 176 105 181 60C164 58 146 54 127 43Z" fill="white" fill-opacity="0.08"/>
+    <path d="M74 92L114 132C133 100 159 78 198 62C171 106 151 139 127 171C101 152 78 126 60 100L74 92Z" fill="url(#shieldBlue)"/>
+    <path d="M70 92L113 132C133 100 159 78 198 62" stroke="white" stroke-opacity="0.45" stroke-width="2"/>
+    <rect x="15" y="50" width="13" height="13" fill="#FACC15" fill-opacity="0.92"/>
+    <rect x="40" y="37" width="22" height="22" fill="white" fill-opacity="0.85"/>
+    <rect x="31" y="71" width="21" height="21" fill="#67E8F9" fill-opacity="0.85"/>
+    <rect x="66" y="78" width="20" height="20" fill="white" fill-opacity="0.9"/>
+    <rect x="49" y="102" width="25" height="15" fill="white" fill-opacity="0.78"/>
+    <rect x="27" y="104" width="11" height="11" fill="white" fill-opacity="0.75"/>
+  </g>
+  <g>
+    <text x="235" y="111" font-family="Inter, Arial, Helvetica, sans-serif" font-size="76" font-weight="300" letter-spacing="8" fill="white">TCD</text>
+    <path d="M520 55H571L543 93L582 145H528L508 116L488 145H437L476 93L448 55H501L516 78L520 55Z" fill="url(#xGrad)"/>
+    <text x="235" y="164" font-family="Inter, Arial, Helvetica, sans-serif" font-size="35" font-weight="300" letter-spacing="15" fill="white" fill-opacity="0.9">COMPLIANCE</text>
+  </g>
 </svg>
