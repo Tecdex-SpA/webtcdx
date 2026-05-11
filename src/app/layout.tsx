@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { NormativeLanding } from "@/components/NormativeLanding";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -64,12 +63,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout() {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-CL">
-      <body className={inter.className}>
-        <NormativeLanding />
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
