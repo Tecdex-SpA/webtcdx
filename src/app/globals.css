@@ -31,3 +31,25 @@ body {
 .card-hover {
   @apply transition duration-300 hover:-translate-y-1 hover:shadow-soft;
 }
+
+/* Header brand logo
+   The supplied logo is transparent/light, so it is always rendered over the current dark header background. */
+header .section-shell > a:first-child {
+  width: 224px;
+  height: 58px;
+  background-image: url('/tcdx-compliance-logo.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
+}
+
+header .section-shell > a:first-child > * {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  header .section-shell > a:first-child {
+    width: 176px;
+    height: 52px;
+  }
+}
