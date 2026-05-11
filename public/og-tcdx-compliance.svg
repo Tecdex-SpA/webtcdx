@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#0B1F3A"/>
+  <circle cx="1040" cy="80" r="260" fill="#38BDF8" fill-opacity="0.22"/>
+  <circle cx="120" cy="520" r="300" fill="#2563EB" fill-opacity="0.28"/>
+  <circle cx="190" cy="130" r="180" fill="#FACC15" fill-opacity="0.12"/>
+  <rect x="72" y="72" width="1056" height="486" rx="44" fill="white" fill-opacity="0.06" stroke="white" stroke-opacity="0.12"/>
+  <image href="/tcdx-compliance-logo.svg" x="80" y="70" width="430" height="126"/>
+  <text x="92" y="282" fill="white" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="800">Gestión ISO simple,</text>
+  <text x="92" y="360" fill="#38BDF8" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="800">trazable y asistida por IA</text>
+  <text x="96" y="430" fill="white" fill-opacity="0.72" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="400">Plataforma SaaS chilena desarrollada por TECDEX</text>
+  <rect x="96" y="482" width="320" height="58" rx="29" fill="#2563EB"/>
+  <text x="130" y="520" fill="white" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700">Solicitar demo</text>
+</svg>
