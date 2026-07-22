@@ -1,18 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="16" fill="#0B1F3A"/>
-  <circle cx="50" cy="12" r="18" fill="#38BDF8" fill-opacity="0.22"/>
-  <circle cx="12" cy="52" r="22" fill="#2563EB" fill-opacity="0.28"/>
-  <path d="M32 9C24.7 13.9 17.2 15.1 10.2 15.8C11.2 35.1 19.2 49 32 59C44.8 49 52.8 35.1 53.8 15.8C46.8 15.1 39.3 13.9 32 9Z" fill="white" fill-opacity="0.08" stroke="white" stroke-opacity="0.38" stroke-width="1.4"/>
-  <path d="M17.6 32.4L28.1 43C34.1 32.3 41.9 24.6 53.2 19.9C44.9 33.3 38.1 44.2 31.8 53.1C24.2 47.6 18.2 40.9 13.9 34.6L17.6 32.4Z" fill="url(#checkGradient)"/>
-  <path d="M18 32.2L28.1 42.8C34.1 32.3 41.9 24.6 53.2 19.9" stroke="white" stroke-opacity="0.55" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="10" y="21" width="4" height="4" rx="1" fill="#FACC15"/>
-  <rect x="17" y="15" width="6" height="6" rx="1.5" fill="white" fill-opacity="0.85"/>
-  <rect x="13" y="29" width="5" height="5" rx="1" fill="#67E8F9" fill-opacity="0.85"/>
-  <defs>
-    <linearGradient id="checkGradient" x1="20" y1="22" x2="48" y2="52" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#7DD3FC"/>
-      <stop offset="0.48" stop-color="#38BDF8"/>
-      <stop offset="1" stop-color="#2563EB"/>
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">TECDEX</title>
+  <desc id="desc">Isotipo corporativo TECDEX</desc>
+  <rect width="512" height="512" rx="112" fill="#2B3944"/>
+  <circle cx="142" cy="274" r="92" fill="#F9C763"/>
+  <circle cx="346" cy="132" r="58" fill="#5CB2B1"/>
+  <circle cx="346" cy="132" r="34" fill="#3F8986"/>
+  <circle cx="346" cy="132" r="25" fill="#FFFFFF"/>
+  <circle cx="352" cy="354" r="92" fill="#6598CC"/>
+  <circle cx="352" cy="354" r="48" fill="#4D80AA"/>
+  <circle cx="352" cy="354" r="38" fill="#FFFFFF"/>
 </svg>
