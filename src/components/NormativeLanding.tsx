@@ -1,3 +1,7 @@
+"use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -103,22 +107,31 @@ function CheckItem({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function NormativeLanding() {
+function NormativeLandingContent() {
+  const searchParams = useSearchParams();
+  // Modo embebido: la app se muestra dentro de un iframe en
+  // https://tecdex.net/iso/, que ya tiene su propio header y su propio
+  // widget de Zoho SalesIQ. Ocultamos el header propio para evitar un
+  // "doble header" cuando se accede vía ?embedded=1.
+  const isEmbedded = searchParams.get("embedded") === "1";
+
   return (
     <main className="min-h-screen bg-brand-soft">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-navy/95 backdrop-blur-xl">
-        <div className="section-shell flex h-16 items-center justify-between">
-          <a href="#top" className="flex items-center gap-3 text-white" aria-label="TCDX Compliance" />
-          <nav className="hidden items-center gap-6 text-sm text-white/70 lg:flex">
-            <a className="hover:text-white" href="#problema">Problema</a>
-            <a className="hover:text-white" href="#solucion">Solución</a>
-            <a className="hover:text-white" href="#como-funciona">Cómo funciona</a>
-            <a className="hover:text-white" href="#planes">Planes</a>
-            <a className="hover:text-white" href="#faq">FAQ</a>
-          </nav>
-          <a href="#contacto" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-brand-navy transition hover:bg-brand-sky">Solicitar demo</a>
-        </div>
-      </header>
+      {!isEmbedded ? (
+        <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-navy/95 backdrop-blur-xl">
+          <div className="section-shell flex h-16 items-center justify-between">
+            <a href="#top" className="flex items-center gap-3 text-white" aria-label="TCDX Compliance" />
+            <nav className="hidden items-center gap-6 text-sm text-white/70 lg:flex">
+              <a className="hover:text-white" href="#problema">Problema</a>
+              <a className="hover:text-white" href="#solucion">Solución</a>
+              <a className="hover:text-white" href="#como-funciona">Cómo funciona</a>
+              <a className="hover:text-white" href="#planes">Planes</a>
+              <a className="hover:text-white" href="#faq">FAQ</a>
+            </nav>
+            <a href="#contacto" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-brand-navy transition hover:bg-brand-sky">Solicitar demo</a>
+          </div>
+        </header>
+      ) : null}
 
       <section id="top" className="relative overflow-hidden bg-brand-navy py-20 text-white sm:py-28">
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(11,31,58,0.96),rgba(11,31,58,0.86)),radial-gradient(circle_at_15%_20%,rgba(250,204,21,0.22),transparent_24%),radial-gradient(circle_at_82%_8%,rgba(56,189,248,0.30),transparent_32%),radial-gradient(circle_at_55%_85%,rgba(37,99,235,0.42),transparent_38%)]" />
@@ -199,5 +212,16 @@ export function NormativeLanding() {
 
       <footer className="border-t border-white/10 bg-brand-navy py-12"><div className="section-shell grid gap-8 text-sm text-white/70 lg:grid-cols-[1.2fr_0.8fr_0.8fr]"><div><p className="text-lg font-bold text-white">TCDX Compliance</p><p className="mt-3 max-w-xl leading-6">Plataforma SaaS de TECDEX SpA para gestión normativa simple, trazable y asistida por IA bajo revisión humana.</p><p className="mt-4 leading-6">IA Auditor opera como herramienta de apoyo para análisis y orientación. No reemplaza auditorías certificadoras, consultores, auditores ni responsables internos.</p></div><div><p className="font-bold text-white">Contacto</p><a className="mt-3 block hover:text-white" href="mailto:contacto@tecdex.net">contacto@tecdex.net</a><a className="mt-2 block hover:text-white" href="https://www.tecdex.net">www.tecdex.net</a></div><div><p className="font-bold text-white">Información</p><a className="mt-3 block hover:text-white" href="#contacto">Solicitar demo</a><Link className="mt-2 block hover:text-white" href="/politica-privacidad">Política de privacidad</Link><p className="mt-5 text-white/45">© {new Date().getFullYear()} TECDEX SpA. Todos los derechos reservados.</p></div></div></footer>
     </main>
+  );
+}
+
+export function NormativeLanding() {
+  // useSearchParams necesita un límite Suspense en el App Router.
+  // fallback={null}: la lectura del query param es instantánea en el
+  // cliente, así que no hay flash visible de contenido.
+  return (
+    <Suspense fallback={null}>
+      <NormativeLandingContent />
+    </Suspense>
   );
 }
