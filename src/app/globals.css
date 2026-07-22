@@ -4,6 +4,13 @@
 
 :root {
   color-scheme: light;
+  --tcdx-navy: #2b3944;
+  --tcdx-orange: #f0721d;
+  --tcdx-teal: #51aba8;
+  --tcdx-surface: #f4f6f7;
+  --tcdx-line: #dce3e7;
+  --tcdx-text: #2b3944;
+  --tcdx-muted: #60717d;
 }
 
 * {
@@ -17,9 +24,18 @@ html {
 
 body {
   margin: 0;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--tcdx-surface);
+  color: var(--tcdx-text);
   overflow-x: hidden;
+  font-family: Arial, Helvetica, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: Roboto, Arial, Helvetica, sans-serif;
 }
 
 img,
@@ -37,7 +53,12 @@ button {
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(240, 114, 29, 0.2);
+}
+
+:focus-visible {
+  outline: 3px solid rgba(81, 171, 168, 0.55);
+  outline-offset: 3px;
 }
 
 .section-shell {
@@ -45,13 +66,50 @@ button {
 }
 
 .card-hover {
-  @apply transition duration-300 hover:-translate-y-1 hover:shadow-soft;
+  @apply transition duration-300 hover:-translate-y-1;
 }
 
-/* Header brand logo
-   The supplied logo is transparent/light, so it is always rendered over the current dark header background. */
+.card-hover:hover {
+  border-color: rgba(81, 171, 168, 0.55);
+  box-shadow: 0 18px 48px rgba(43, 57, 68, 0.1);
+}
+
+header {
+  border-bottom-color: rgba(101, 155, 208, 0.55) !important;
+  background: rgba(43, 57, 68, 0.97) !important;
+}
+
+header .section-shell {
+  min-height: 76px;
+}
+
+header nav a {
+  position: relative;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+header nav a::after {
+  position: absolute;
+  right: 0;
+  bottom: -12px;
+  left: 0;
+  height: 3px;
+  background: #fbc962;
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.5);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+header nav a:hover::after,
+header nav a:focus-visible::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 header .section-shell > a:first-child {
-  width: 224px;
+  width: 220px;
   height: 58px;
   background-image: url('/tcdx-compliance-logo.svg');
   background-repeat: no-repeat;
@@ -64,10 +122,151 @@ header .section-shell > a:first-child > * {
   display: none;
 }
 
-/* Professional mobile tuning */
+header .section-shell > a:last-child,
+#top a[href="#contacto"],
+#fundadores a[href="#contacto"] {
+  background: var(--tcdx-orange) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+header .section-shell > a:last-child:hover,
+#top a[href="#contacto"]:hover,
+#fundadores a[href="#contacto"]:hover {
+  background: #d95f12 !important;
+  transform: translateY(-1px);
+}
+
+#top {
+  background: var(--tcdx-navy) !important;
+}
+
+#top > div:first-child {
+  background:
+    linear-gradient(118deg, rgba(43, 57, 68, 0.98), rgba(43, 57, 68, 0.82)),
+    radial-gradient(circle at 18% 20%, rgba(240, 114, 29, 0.3), transparent 30%),
+    radial-gradient(circle at 84% 16%, rgba(81, 171, 168, 0.3), transparent 34%) !important;
+}
+
+#top h1 {
+  max-width: 780px;
+  font-size: clamp(3.5rem, 8vw, 6.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+
+#top h1 + p {
+  color: #8fd0ce !important;
+}
+
+#top .shadow-soft,
+#top .backdrop-blur {
+  box-shadow: none;
+}
+
+main > section:not(#top):not(#fundadores):not(#ia-auditor):not(#contacto) article,
+main > section:not(#top):not(#fundadores):not(#ia-auditor):not(#contacto) .rounded-3xl {
+  box-shadow: none;
+}
+
+main section[id] {
+  scroll-margin-top: 88px;
+}
+
+main section:nth-of-type(even):not(#top):not(#fundadores):not(#ia-auditor):not(#contacto) {
+  background-color: #fff;
+}
+
+main section:nth-of-type(odd):not(#top):not(#fundadores):not(#ia-auditor):not(#contacto) {
+  background-color: var(--tcdx-surface);
+}
+
+main section h2 {
+  text-wrap: balance;
+}
+
+main section p {
+  text-wrap: pretty;
+}
+
+.bg-brand-navy {
+  background-color: var(--tcdx-navy) !important;
+}
+
+.text-brand-blue {
+  color: var(--tcdx-orange) !important;
+}
+
+.text-brand-sky,
+.text-brand-green {
+  color: var(--tcdx-teal) !important;
+}
+
+.border-brand-blue {
+  border-color: var(--tcdx-orange) !important;
+}
+
+.bg-brand-blue {
+  background-color: var(--tcdx-orange) !important;
+}
+
+.bg-brand-blue:hover {
+  background-color: #d95f12 !important;
+}
+
+.bg-blue-50,
+.bg-emerald-50 {
+  background-color: rgba(81, 171, 168, 0.1) !important;
+}
+
+.text-emerald-700 {
+  color: #287875 !important;
+}
+
+form input,
+form select,
+form textarea {
+  border-radius: 10px !important;
+  background: #fff;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  border-color: var(--tcdx-teal) !important;
+  box-shadow: 0 0 0 4px rgba(81, 171, 168, 0.12);
+}
+
+form button {
+  background: var(--tcdx-orange) !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+
+footer {
+  background: var(--tcdx-surface) !important;
+  color: var(--tcdx-text) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @media (max-width: 1023px) {
   header .section-shell {
-    height: 72px;
+    min-height: 72px;
   }
 }
 
@@ -81,7 +280,7 @@ header .section-shell > a:first-child > * {
   }
 
   header .section-shell {
-    height: 64px;
+    min-height: 64px;
     gap: 12px;
   }
 
@@ -125,7 +324,7 @@ header .section-shell > a:first-child > * {
   }
 
   #top h1 {
-    font-size: clamp(2.55rem, 13vw, 4rem);
+    font-size: clamp(2.65rem, 13vw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.055em;
   }
@@ -156,10 +355,6 @@ header .section-shell > a:first-child > * {
 
   #top .grid .rounded-2xl {
     min-width: 0;
-  }
-
-  .shadow-soft {
-    box-shadow: 0 18px 52px rgba(15, 23, 42, 0.14);
   }
 
   form input,
@@ -194,6 +389,6 @@ header .section-shell > a:first-child > * {
   }
 
   #top h1 {
-    font-size: clamp(2.25rem, 12vw, 3rem);
+    font-size: clamp(2.35rem, 12vw, 3rem);
   }
 }
