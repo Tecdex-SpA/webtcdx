@@ -10,18 +10,25 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          navy: "#0B1F3A",
-          blue: "#2563EB",
-          sky: "#38BDF8",
-          green: "#10B981",
-          slate: "#0F172A",
-          muted: "#475569",
-          soft: "#F8FAFC",
-          line: "#E2E8F0",
+          navy: "#2B3944",
+          blue: "#F0721D",
+          sky: "#51ABA8",
+          green: "#51ABA8",
+          slate: "#2B3944",
+          muted: "#60717D",
+          soft: "#F4F6F7",
+          line: "#DCE3E7",
         },
       },
       boxShadow: {
-        soft: "0 24px 80px rgba(15, 23, 42, 0.12)",
+        soft: "0 18px 48px rgba(43, 57, 68, 0.10)",
+      },
+      fontFamily: {
+        sans: ["Arial", "Helvetica", "system-ui", "sans-serif"],
+        display: ["Roboto", "Arial", "Helvetica", "sans-serif"],
+      },
+      borderRadius: {
+        "4xl": "2rem",
       },
     },
   },
