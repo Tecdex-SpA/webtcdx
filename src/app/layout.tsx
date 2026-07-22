@@ -27,6 +27,20 @@ export const metadata: Metadata = {
   authors: [{ name: "TECDEX" }],
   creator: "TECDEX",
   publisher: "TECDEX",
+  icons: {
+    icon: [
+      {
+        url: "https://tecdex.net/wp-content/uploads/2020/04/cropped-cropped-logo-web.png",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "https://tecdex.net/wp-content/uploads/2020/04/cropped-cropped-logo-web.png",
+        type: "image/png",
+      },
+    ],
+  },
   robots: {
     index: true,
     follow: true,
