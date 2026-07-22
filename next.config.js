@@ -21,6 +21,14 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/blog/:slug",
+        destination: "https://tecdex.net/:slug/",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

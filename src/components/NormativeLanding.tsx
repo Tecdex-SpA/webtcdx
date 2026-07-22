@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 const modules = [
-  ["Diagnóstico normativo", "Evalúa el estado inicial de cumplimiento, identifica brechas y ayuda a priorizar el trabajo según la normativa activa.", ClipboardCheck],
+  ["Diagnóstico normativo", "Evalúa el estado inicial de cumplimiento en tu software ISO, identifica brechas y ayuda a priorizar el trabajo según la normativa activa.", ClipboardCheck],
   ["Controles y evidencias", "Administra controles, responsables, estados y evidencias asociadas para saber qué está respaldado y qué falta.", FileCheck2],
   ["Matriz de riesgos", "Ordena riesgos, impactos, probabilidades, tratamientos y responsables en una vista trazable.", TriangleAlert],
   ["Planes de acción", "Convierte brechas y tareas pendientes en acciones concretas con responsable, fecha y estado.", ListChecks],
@@ -44,9 +44,9 @@ const problems = [
 ];
 
 const standards = [
-  ["9001:2015", "Gestión de calidad", "Para ordenar procesos, responsabilidades, evidencias, acciones correctivas y mejora continua."],
-  ["27001:2022", "Seguridad de la información", "Para gestionar controles, riesgos, activos, evidencias y preparación frente a auditorías de seguridad."],
-  ["42001:2023", "Sistema de gestión de inteligencia artificial", "Para organizaciones que requieren gobernanza, control y trazabilidad sobre el uso de inteligencia artificial."],
+  ["9001:2015", "Gestión de calidad ISO 9001", "Para ordenar procesos, responsabilidades, evidencias, acciones correctivas y mejora continua."],
+  ["27001:2022", "Gestión ISO 27001", "Para gestionar controles, riesgos, activos, evidencias y preparación frente a auditorías de seguridad de la información."],
+  ["42001:2023", "Gestión de inteligencia artificial ISO 42001", "Para organizaciones que requieren gobernanza, control y trazabilidad sobre el uso de inteligencia artificial."],
 ];
 
 const includes = [
@@ -65,7 +65,7 @@ const includes = [
 ];
 
 const steps = [
-  ["01", "Evaluamos el alcance", "Revisamos normativa de interés, estado actual, responsables y nivel de avance."],
+  ["01", "Evaluamos el alcance", "Revisamos la normativa ISO de interés, el estado actual, los responsables y el nivel de avance."],
   ["02", "Configuramos la base", "Activamos empresa, normativa, módulos, responsables y estructura inicial."],
   ["03", "Ordenamos evidencias", "Centralizamos controles, evidencias, riesgos, hallazgos y planes de acción."],
   ["04", "Revisamos brechas", "IA Auditor apoya el análisis, siempre con revisión y criterio humano."],
@@ -86,6 +86,7 @@ const faqs = [
   ["¿IA Auditor reemplaza a un auditor o consultor?", "No. IA Auditor funciona como apoyo de análisis y orientación. Sus resultados deben ser revisados por responsables humanos, consultores o auditores según corresponda."],
   ["¿Por qué partir con 1 o 2 normativas?", "En etapa inicial recomendamos un alcance controlado para configurar bien procesos, evidencias, responsables y reportes antes de escalar."],
   ["¿Los usuarios tienen límite?", "En la oferta fundadora no se define un límite comercial inicial de usuarios. El alcance se revisa durante la evaluación comercial y el onboarding."],
+  ["¿La plataforma sirve para ISO 27001, 9001 y 42001?", "Sí. TCDX Compliance está diseñada para ISO 9001 (calidad), ISO 27001 (seguridad de la información) e ISO 42001 (gestión de IA), permitiendo 1 o 2 normativas por cliente en etapa inicial."],
 ];
 
 function SectionHeading({ eyebrow, title, description }: { eyebrow?: string; title: string; description?: string }) {
@@ -143,7 +144,7 @@ function NormativeLandingContent() {
               Etapa fundadora abierta · máximo 5 empresas
             </div>
             <h1 className="text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">TCDX Compliance</h1>
-            <p className="mt-6 text-2xl font-semibold text-brand-sky sm:text-3xl">Gestión normativa simple, trazable y asistida por IA</p>
+            <p className="mt-6 text-2xl font-semibold text-brand-sky sm:text-3xl">Plataforma de gestión normativa ISO 27001, 9001 y 42001, simple y trazable</p>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/75">
               Centraliza controles, evidencias, riesgos, planes de acción, auditorías y reportes ejecutivos en una plataforma SaaS chilena, con onboarding asistido por TECDEX.
             </p>
