@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">TECDEX</title>
+  <desc id="desc">Isotipo corporativo TECDEX</desc>
+  <rect width="512" height="512" rx="112" fill="#2B3944"/>
+  <circle cx="142" cy="274" r="92" fill="#F9C763"/>
+  <circle cx="346" cy="132" r="58" fill="#5CB2B1"/>
+  <circle cx="346" cy="132" r="34" fill="#3F8986"/>
+  <circle cx="346" cy="132" r="25" fill="#FFFFFF"/>
+  <circle cx="352" cy="354" r="92" fill="#6598CC"/>
+  <circle cx="352" cy="354" r="48" fill="#4D80AA"/>
+  <circle cx="352" cy="354" r="38" fill="#FFFFFF"/>
+</svg>
