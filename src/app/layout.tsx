@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tcdx.cl"),
+  metadataBase: new URL("https://isos.tecdex.net"),
   alternates: {
     canonical: "https://tecdex.net/iso",
   },
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: "Plataforma ISO 27001, 9001 y 42001 en Chile | TCDX Compliance — TecDex",
     description:
       "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
-    url: "https://tcdx.cl",
+    url: "https://tecdex.net/iso",
     siteName: "TCDX Compliance",
     type: "website",
     locale: "es_CL",
