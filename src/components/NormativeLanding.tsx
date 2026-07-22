@@ -1,3 +1,7 @@
+"use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -20,7 +24,7 @@ import {
 } from "lucide-react";
 
 const modules = [
-  ["Diagnóstico normativo", "Evalúa el estado inicial de cumplimiento, identifica brechas y ayuda a priorizar el trabajo según la normativa activa.", ClipboardCheck],
+  ["Diagnóstico normativo", "Evalúa el estado inicial de cumplimiento en tu software ISO, identifica brechas y ayuda a priorizar el trabajo según la normativa activa.", ClipboardCheck],
   ["Controles y evidencias", "Administra controles, responsables, estados y evidencias asociadas para saber qué está respaldado y qué falta.", FileCheck2],
   ["Matriz de riesgos", "Ordena riesgos, impactos, probabilidades, tratamientos y responsables en una vista trazable.", TriangleAlert],
   ["Planes de acción", "Convierte brechas y tareas pendientes en acciones concretas con responsable, fecha y estado.", ListChecks],
@@ -40,9 +44,9 @@ const problems = [
 ];
 
 const standards = [
-  ["9001:2015", "Gestión de calidad", "Para ordenar procesos, responsabilidades, evidencias, acciones correctivas y mejora continua."],
-  ["27001:2022", "Seguridad de la información", "Para gestionar controles, riesgos, activos, evidencias y preparación frente a auditorías de seguridad."],
-  ["42001:2023", "Sistema de gestión de inteligencia artificial", "Para organizaciones que requieren gobernanza, control y trazabilidad sobre el uso de inteligencia artificial."],
+  ["9001:2015", "Gestión de calidad ISO 9001", "Para ordenar procesos, responsabilidades, evidencias, acciones correctivas y mejora continua."],
+  ["27001:2022", "Gestión ISO 27001", "Para gestionar controles, riesgos, activos, evidencias y preparación frente a auditorías de seguridad de la información."],
+  ["42001:2023", "Gestión de inteligencia artificial ISO 42001", "Para organizaciones que requieren gobernanza, control y trazabilidad sobre el uso de inteligencia artificial."],
 ];
 
 const includes = [
@@ -61,7 +65,7 @@ const includes = [
 ];
 
 const steps = [
-  ["01", "Evaluamos el alcance", "Revisamos normativa de interés, estado actual, responsables y nivel de avance."],
+  ["01", "Evaluamos el alcance", "Revisamos la normativa ISO de interés, el estado actual, los responsables y el nivel de avance."],
   ["02", "Configuramos la base", "Activamos empresa, normativa, módulos, responsables y estructura inicial."],
   ["03", "Ordenamos evidencias", "Centralizamos controles, evidencias, riesgos, hallazgos y planes de acción."],
   ["04", "Revisamos brechas", "IA Auditor apoya el análisis, siempre con revisión y criterio humano."],
@@ -82,6 +86,7 @@ const faqs = [
   ["¿IA Auditor reemplaza a un auditor o consultor?", "No. IA Auditor funciona como apoyo de análisis y orientación. Sus resultados deben ser revisados por responsables humanos, consultores o auditores según corresponda."],
   ["¿Por qué partir con 1 o 2 normativas?", "En etapa inicial recomendamos un alcance controlado para configurar bien procesos, evidencias, responsables y reportes antes de escalar."],
   ["¿Los usuarios tienen límite?", "En la oferta fundadora no se define un límite comercial inicial de usuarios. El alcance se revisa durante la evaluación comercial y el onboarding."],
+  ["¿La plataforma sirve para ISO 27001, 9001 y 42001?", "Sí. TCDX Compliance está diseñada para ISO 9001 (calidad), ISO 27001 (seguridad de la información) e ISO 42001 (gestión de IA), permitiendo 1 o 2 normativas por cliente en etapa inicial."],
 ];
 
 function SectionHeading({ eyebrow, title, description }: { eyebrow?: string; title: string; description?: string }) {
@@ -103,22 +108,30 @@ function CheckItem({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function NormativeLanding() {
+function NormativeLandingContent() {
+  const searchParams = useSearchParams();
+  // Modo embebido: la app se muestra dentro de un iframe en
+  // https://tecdex.net/iso/, que ya tiene su propio header y su propio
+  // widget de Zoho SalesIQ. Ocultamos el header propio para evitar un
+  // "doble header" cuando se accede vía ?embedded=1.
+  const isEmbedded = searchParams.get("embedded") === "1";
+
   return (
     <main className="min-h-screen bg-brand-soft">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-navy/95 backdrop-blur-xl">
-        <div className="section-shell flex h-16 items-center justify-between">
-          <a href="#top" className="flex items-center gap-3 text-white" aria-label="TCDX Compliance" />
-          <nav className="hidden items-center gap-6 text-sm text-white/70 lg:flex">
-            <a className="hover:text-white" href="#problema">Problema</a>
-            <a className="hover:text-white" href="#solucion">Solución</a>
-            <a className="hover:text-white" href="#como-funciona">Cómo funciona</a>
-            <a className="hover:text-white" href="#planes">Planes</a>
-            <a className="hover:text-white" href="#faq">FAQ</a>
-          </nav>
-          <a href="#contacto" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-brand-navy transition hover:bg-brand-sky">Solicitar demo</a>
-        </div>
-      </header>
+      {!isEmbedded ? (
+        <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-navy/95 backdrop-blur-xl">
+          <div className="section-shell flex h-16 items-center justify-between">
+            <a href="#top" className="flex items-center gap-3 text-white" aria-label="TCDX Compliance" />
+            <nav className="hidden items-center gap-6 text-sm text-white/70 lg:flex">
+              <a className="hover:text-white" href="#problema">Problema</a>
+              <a className="hover:text-white" href="#solucion">Solución</a>
+              <a className="hover:text-white" href="#como-funciona">Cómo funciona</a>
+              <a className="hover:text-white" href="#faq">FAQ</a>
+            </nav>
+            <a href="#contacto" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-brand-navy transition hover:bg-brand-sky">Solicitar demo</a>
+          </div>
+        </header>
+      ) : null}
 
       <section id="top" className="relative overflow-hidden bg-brand-navy py-20 text-white sm:py-28">
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(11,31,58,0.96),rgba(11,31,58,0.86)),radial-gradient(circle_at_15%_20%,rgba(250,204,21,0.22),transparent_24%),radial-gradient(circle_at_82%_8%,rgba(56,189,248,0.30),transparent_32%),radial-gradient(circle_at_55%_85%,rgba(37,99,235,0.42),transparent_38%)]" />
@@ -130,7 +143,7 @@ export function NormativeLanding() {
               Etapa fundadora abierta · máximo 5 empresas
             </div>
             <h1 className="text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">TCDX Compliance</h1>
-            <p className="mt-6 text-2xl font-semibold text-brand-sky sm:text-3xl">Gestión normativa simple, trazable y asistida por IA</p>
+            <p className="mt-6 text-2xl font-semibold text-brand-sky sm:text-3xl">Plataforma de gestión normativa ISO 27001, 9001 y 42001, simple y trazable</p>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/75">
               Centraliza controles, evidencias, riesgos, planes de acción, auditorías y reportes ejecutivos en una plataforma SaaS chilena, con onboarding asistido por TECDEX.
             </p>
@@ -185,8 +198,6 @@ export function NormativeLanding() {
 
       <section id="ia-auditor" className="bg-brand-navy py-20 text-white sm:py-24"><div className="section-shell grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center"><div><p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-brand-sky">IA con criterio prudente</p><h2 className="text-3xl font-bold tracking-tight sm:text-4xl">IA Auditor como apoyo, no como reemplazo humano</h2><p className="mt-6 text-lg leading-8 text-white/75">IA Auditor ayuda a revisar información cargada, detectar focos de atención, sugerir preguntas de auditoría y orientar acciones. Sus resultados deben ser revisados por responsables humanos y no reemplazan una auditoría certificadora.</p><p className="mt-5 text-sm leading-6 text-white/55">La inteligencia artificial se utiliza como herramienta de apoyo para análisis y orientación. Las decisiones, validaciones, aprobaciones y conclusiones formales deben permanecer bajo responsabilidad de personas autorizadas por la organización.</p></div><div className="rounded-3xl border border-white/10 bg-white/10 p-7 backdrop-blur"><ul className="space-y-4">{["Sugiere focos de revisión", "Identifica brechas y riesgos", "Recomienda acciones", "Apoya preparación de auditorías", "Requiere validación humana"].map((item) => <li key={item} className="flex gap-3 text-white/80"><CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-brand-green" /><span>{item}</span></li>)}</ul></div></div></section>
 
-      <section id="planes" className="py-20 sm:py-24"><div className="section-shell"><SectionHeading eyebrow="Oferta fundadora" title="Planes fundadores para la etapa inicial" description="Precio preferente, onboarding asistido y alcance controlado para empresas que quieran dejar de gestionar cumplimiento normativo con planillas dispersas." /><div className="mt-12 grid gap-6 lg:grid-cols-2"><article className="rounded-3xl border border-brand-line bg-white p-8 shadow-sm"><h3 className="text-2xl font-black text-brand-slate">Plan 1 Normativa</h3><p className="mt-5 text-4xl font-black text-brand-slate">CLP $79.000</p><p className="mt-1 text-sm text-brand-muted">+ IVA mensual</p><p className="mt-5 text-sm leading-6 text-brand-muted">Setup inicial desde <strong>CLP $150.000 + IVA</strong>.</p><p className="mt-4 text-sm leading-6 text-brand-muted">Incluye activación inicial, acompañamiento de puesta en marcha y configuración base para una normativa.</p><a href="#contacto" className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-brand-slate px-6 py-4 text-sm font-bold text-white transition hover:bg-brand-blue">Postular a cupo fundador</a></article><article className="relative rounded-3xl border-2 border-brand-blue bg-white p-8 shadow-soft"><div className="absolute right-6 top-6 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-brand-blue">Más recomendado</div><h3 className="text-2xl font-black text-brand-slate">Plan 2 Normativas</h3><p className="mt-5 text-4xl font-black text-brand-slate">CLP $129.000</p><p className="mt-1 text-sm text-brand-muted">+ IVA mensual</p><p className="mt-5 text-sm leading-6 text-brand-muted">Setup inicial desde <strong>CLP $220.000 + IVA</strong>.</p><p className="mt-4 text-sm leading-6 text-brand-muted">Pensado para empresas que necesitan operar dos normativas con una gestión más integrada desde el inicio.</p><a href="#contacto" className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-brand-blue px-6 py-4 text-sm font-bold text-white transition hover:bg-blue-500">Solicitar evaluación comercial</a></article></div><p className="mx-auto mt-8 max-w-3xl text-center text-sm leading-6 text-brand-muted">Oferta válida para primeros clientes fundadores, con onboarding asistido y alcance controlado. La disponibilidad de cupos y condiciones finales se confirman luego de una evaluación inicial.</p></div></section>
-
       <section className="bg-white py-20 sm:py-24"><div className="section-shell"><SectionHeading eyebrow="Incluye" title="Qué incluye TCDX Compliance" /><ul className="mt-12 grid gap-4 rounded-3xl border border-brand-line bg-brand-soft p-6 sm:grid-cols-2 lg:grid-cols-3">{includes.map((item) => <CheckItem key={item}>{item}</CheckItem>)}</ul></div></section>
 
       <section id="para-quien-es" className="py-20 sm:py-24"><div className="section-shell"><SectionHeading eyebrow="Para quién es" title="Diseñado para equipos que necesitan visibilidad y trazabilidad normativa" description="La plataforma ayuda a ordenar el trabajo de quienes deben preparar, operar o acompañar procesos de cumplimiento." /><div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{audiences.map(([title, description]) => <article key={title} className="rounded-3xl border border-brand-line bg-white p-6 shadow-sm"><h3 className="text-lg font-bold text-brand-slate">{title}</h3><p className="mt-3 text-sm leading-6 text-brand-muted">{description}</p></article>)}</div></div></section>
@@ -195,9 +206,20 @@ export function NormativeLanding() {
 
       <section id="faq" className="py-20 sm:py-24"><div className="section-shell"><SectionHeading eyebrow="Preguntas frecuentes" title="Respuestas claras antes de solicitar una demo" description="La etapa fundadora está diseñada con expectativas realistas, alcance controlado y acompañamiento humano." /><div className="mx-auto mt-12 grid max-w-4xl gap-4">{faqs.map(([question, answer]) => <article key={question} className="rounded-3xl border border-brand-line bg-white p-6 shadow-sm"><h3 className="text-lg font-bold text-brand-slate">{question}</h3><p className="mt-3 text-sm leading-6 text-brand-muted">{answer}</p></article>)}</div></div></section>
 
-      <section id="contacto" className="bg-brand-navy py-20 text-white sm:py-24"><div className="section-shell grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start"><div><p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-brand-sky">Contacto</p><h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Solicita una demo de TCDX Compliance</h2><p className="mt-5 text-lg leading-8 text-white/70">Cuéntanos sobre tu empresa y la normativa que necesitas gestionar. TECDEX revisará tu caso y te contactará para coordinar una demo comercial.</p><p className="mt-6 text-sm leading-6 text-white/50">Al enviar este formulario, autorizas a TECDEX a contactarte para entregar información comercial sobre TCDX Compliance. La demo y condiciones comerciales estarán sujetas a evaluación del alcance requerido.</p></div><form className="grid gap-4 rounded-[2rem] bg-white p-6 text-brand-slate shadow-soft sm:grid-cols-2"><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Empresa" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Nombre" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Cargo" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Correo" type="email" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Teléfono" /><select className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" defaultValue=""><option value="" disabled>Normativa de interés</option><option>9001</option><option>27001</option><option>42001</option><option>No estoy seguro</option><option>Otra</option></select><textarea className="min-h-32 rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue sm:col-span-2" placeholder="Cuéntanos brevemente cómo gestionan hoy su cumplimiento normativo, qué normativa les interesa y si ya cuentan con implementación, consultor o auditoría programada." /><button className="rounded-full bg-brand-blue px-7 py-4 text-sm font-bold text-white transition hover:bg-blue-500 sm:col-span-2" type="button">Solicitar demo</button><p className="flex items-center gap-2 text-xs text-brand-muted sm:col-span-2"><Mail className="h-4 w-4" /> El envío del formulario será conectado posteriormente con Zoho Forms.</p></form></div></section>
+      <section id="contacto" className="bg-brand-navy py-20 text-white sm:py-24"><div className="section-shell grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start"><div><p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-brand-sky">Contacto</p><h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Solicita una demo de TCDX Compliance</h2><p className="mt-5 text-lg leading-8 text-white/70">Cuéntanos sobre tu empresa y la normativa que necesitas gestionar. TECDEX revisará tu caso y te contactará para coordinar una demo comercial.</p><p className="mt-6 text-sm leading-6 text-white/50">Al enviar este formulario, autorizas a TECDEX a contactarte para entregar información comercial sobre TCDX Compliance. La demo y condiciones comerciales estarán sujetas a evaluación del alcance requerido.</p></div><form className="grid gap-4 rounded-[2rem] bg-white p-6 text-brand-slate shadow-soft sm:grid-cols-2"><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Empresa" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Nombre" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Cargo" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Correo" type="email" /><input className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" placeholder="Teléfono" /><select aria-label="Normativa de interés" className="rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue" defaultValue=""><option value="" disabled>Normativa de interés</option><option>9001</option><option>27001</option><option>42001</option><option>No estoy seguro</option><option>Otra</option></select><textarea className="min-h-32 rounded-2xl border border-brand-line px-4 py-3 outline-none focus:border-brand-blue sm:col-span-2" placeholder="Cuéntanos brevemente cómo gestionan hoy su cumplimiento normativo, qué normativa les interesa y si ya cuentan con implementación, consultor o auditoría programada." /><button className="rounded-full bg-brand-blue px-7 py-4 text-sm font-bold text-white transition hover:bg-blue-500 sm:col-span-2" type="button">Solicitar demo</button><p className="flex items-center gap-2 text-xs text-brand-muted sm:col-span-2"><Mail className="h-4 w-4" /> El envío del formulario será conectado posteriormente con Zoho Forms.</p></form></div></section>
 
       <footer className="border-t border-white/10 bg-brand-navy py-12"><div className="section-shell grid gap-8 text-sm text-white/70 lg:grid-cols-[1.2fr_0.8fr_0.8fr]"><div><p className="text-lg font-bold text-white">TCDX Compliance</p><p className="mt-3 max-w-xl leading-6">Plataforma SaaS de TECDEX SpA para gestión normativa simple, trazable y asistida por IA bajo revisión humana.</p><p className="mt-4 leading-6">IA Auditor opera como herramienta de apoyo para análisis y orientación. No reemplaza auditorías certificadoras, consultores, auditores ni responsables internos.</p></div><div><p className="font-bold text-white">Contacto</p><a className="mt-3 block hover:text-white" href="mailto:contacto@tecdex.net">contacto@tecdex.net</a><a className="mt-2 block hover:text-white" href="https://www.tecdex.net">www.tecdex.net</a></div><div><p className="font-bold text-white">Información</p><a className="mt-3 block hover:text-white" href="#contacto">Solicitar demo</a><Link className="mt-2 block hover:text-white" href="/politica-privacidad">Política de privacidad</Link><p className="mt-5 text-white/45">© {new Date().getFullYear()} TECDEX SpA. Todos los derechos reservados.</p></div></div></footer>
     </main>
+  );
+}
+
+export function NormativeLanding() {
+  // useSearchParams necesita un límite Suspense en el App Router.
+  // fallback={null}: la lectura del query param es instantánea en el
+  // cliente, así que no hay flash visible de contenido.
+  return (
+    <Suspense fallback={null}>
+      <NormativeLandingContent />
+    </Suspense>
   );
 }

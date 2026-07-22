@@ -7,15 +7,23 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tcdx.cl"),
+  alternates: {
+    canonical: "https://tecdex.net/iso",
+  },
   title: {
-    default: "TCDX Compliance | Plataforma SaaS chilena para gestión normativa",
+    default: "Plataforma ISO 27001, 9001 y 42001 en Chile | TCDX Compliance — TecDex",
     template: "%s | TCDX Compliance",
   },
   description:
-    "Centraliza controles, evidencias, riesgos, planes de acción, auditorías y reportes ejecutivos para gestión normativa con TCDX Compliance, plataforma SaaS chilena desarrollada por TECDEX.",
+    "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
   keywords: [
     "TCDX Compliance",
     "TECDEX",
+    "plataforma ISO Chile",
+    "software ISO Chile",
+    "plataforma ISO para empresas",
+    "gestión ISO 27001",
+    "plataforma ISO 27001",
     "gestión normativa Chile",
     "software cumplimiento normativo",
     "cumplimiento normativo",
@@ -44,9 +52,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "TCDX Compliance | Gestión normativa simple, trazable y asistida por IA",
+    title: "Plataforma ISO 27001, 9001 y 42001 en Chile | TCDX Compliance — TecDex",
     description:
-      "Plataforma SaaS chilena de TECDEX para centralizar controles, evidencias, riesgos, auditorías, planes de acción y reportes ejecutivos de cumplimiento normativo.",
+      "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
     url: "https://tcdx.cl",
     siteName: "TCDX Compliance",
     type: "website",
@@ -56,17 +64,67 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "TCDX Compliance - Gestión normativa simple, trazable y asistida por IA",
+        alt: "TCDX Compliance, plataforma ISO 27001, 9001 y 42001 en Chile",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TCDX Compliance | Gestión normativa simple, trazable y asistida por IA",
+    title: "Plataforma ISO 27001, 9001 y 42001 en Chile | TCDX Compliance — TecDex",
     description:
-      "Plataforma SaaS chilena de TECDEX para centralizar controles, evidencias, riesgos, auditorías, planes de acción y reportes ejecutivos de cumplimiento normativo.",
+      "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
     images: ["/opengraph-image"],
   },
+};
+
+const softwareApplicationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "TCDX Compliance",
+  url: "https://tecdex.net/iso",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description:
+    "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
+  publisher: {
+    "@type": "Organization",
+    name: "TecDex",
+    url: "https://tecdex.net",
+  },
+};
+
+const faqPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    [
+      "¿TCDX Compliance certifica automáticamente a una empresa?",
+      "No. La plataforma ayuda a ordenar, operar y preparar mejor la gestión normativa, pero no emite certificaciones ni reemplaza a una casa certificadora.",
+    ],
+    [
+      "¿IA Auditor reemplaza a un auditor o consultor?",
+      "No. IA Auditor funciona como apoyo de análisis y orientación. Sus resultados deben ser revisados por responsables humanos, consultores o auditores según corresponda.",
+    ],
+    [
+      "¿Por qué partir con 1 o 2 normativas?",
+      "En etapa inicial recomendamos un alcance controlado para configurar bien procesos, evidencias, responsables y reportes antes de escalar.",
+    ],
+    [
+      "¿Los usuarios tienen límite?",
+      "En la oferta fundadora no se define un límite comercial inicial de usuarios. El alcance se revisa durante la evaluación comercial y el onboarding.",
+    ],
+    [
+      "¿La plataforma sirve para ISO 27001, 9001 y 42001?",
+      "Sí. TCDX Compliance está diseñada para ISO 9001 (calidad), ISO 27001 (seguridad de la información) e ISO 42001 (gestión de IA), permitiendo 1 o 2 normativas por cliente en etapa inicial.",
+    ],
+  ].map(([question, answer]) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: answer,
+    },
+  })),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -75,6 +133,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
         <link rel="shortcut icon" href="/favicon.svg?v=2" type="image/svg+xml" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(softwareApplicationJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqPageJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
       </head>
       <body className={inter.className}>
         <RouteRenderer>{children}</RouteRenderer>
