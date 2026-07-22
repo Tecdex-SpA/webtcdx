@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   authors: [{ name: "TECDEX" }],
   creator: "TECDEX",
   publisher: "TECDEX",
+  icons: {
+    icon: [{ url: "/favicon.svg?v=2", type: "image/svg+xml" }],
+    shortcut: [{ url: "/favicon.svg?v=2", type: "image/svg+xml" }],
+    apple: [{ url: "/favicon.svg?v=2", type: "image/svg+xml" }],
+  },
   robots: {
     index: true,
     follow: true,
@@ -67,6 +72,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-CL">
+      <head>
+        <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
+        <link rel="shortcut icon" href="/favicon.svg?v=2" type="image/svg+xml" />
+      </head>
       <body className={inter.className}>
         <RouteRenderer>{children}</RouteRenderer>
       </body>
