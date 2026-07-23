@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { RouteRenderer } from "@/components/RouteRenderer";
+import { WhatsAppFloatButton } from "@/components/WhatsAppFloatButton";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -148,6 +149,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={inter.className}>
         <RouteRenderer>{children}</RouteRenderer>
+        <WhatsAppFloatButton />
       </body>
     </html>
   );
