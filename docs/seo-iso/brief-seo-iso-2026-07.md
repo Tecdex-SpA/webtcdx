@@ -212,6 +212,24 @@ Explicación más probable de lo que vio el chequeo externo: no es Vercel. Candi
 
 **Recomendación (no ejecutada, pendiente de decisión de Mario):** si se quiere blindaje adicional independiente de lo que WordPress decida enviar en el futuro (defensa en profundidad, no porque haya evidencia de un problema hoy), se podría agregar una entrada `headers()` en `next.config.js` con `source: "/blog/:slug"` y `Cache-Control: no-store` explícito, forzando que esta ruta nunca sea cacheable por Vercel pase lo que pase con la config de WordPress. No se implementó en esta sesión por no haber evidencia que lo justifique y porque modifica un archivo de configuración compartido (`next.config.js`) sin una necesidad confirmada.
 
+**Seguimiento 2026-07-24 (tres tareas de cierre pedidas por Mario):**
+
+1. **Merge de PR #7** (el que corrigió esta sección y documentó la investigación de arriba) aprobado y mergeado a `main` en `02819a9`.
+
+2. **Header defensivo `Cache-Control: no-store` agregado para `/blog/:slug`**, en `next.config.js`, rama `hardening/blog-proxy-no-store` (PR aparte, ver más abajo). Es puramente preventivo — no porque haya evidencia de que Vercel cachee hoy (ver arriba, sigue dando `MISS`), sino para que esta ruta de proxy nunca pueda quedar cacheada del lado de Vercel si en el futuro cambia algo en Vercel o en el `Cache-Control` que manda WordPress.
+   **Limitación de verificación local, reportada con transparencia:** al probar el header en local (`next start`, modo producción) contra `/blog/gestion-evidencias-iso-27001-trazabilidad`, el `Cache-Control: no-store` **no apareció** en la respuesta — solo se vio el `cache-control: no-cache` que manda WordPress. Esto es consistente con una limitación conocida de Next.js: cuando `rewrites()` apunta a un destino externo, el servidor local (`next dev`/`next start`) no siempre aplica las reglas de `headers()` sobre la respuesta proxied de la misma forma que lo hace la plataforma de Vercel en producción. Como evidencia de que en producción real sí se aplican — el CSP `frame-ancestors` de la regla `"/(.*)"` (la otra entrada de `headers()` en este mismo archivo) **sí aparece hoy** en `curl` contra `isos.tecdex.net/blog/{slug}` en producción (ver verificación de arriba), algo que solo pudo haber agregado `next.config.js`, no WordPress. Por eso se espera que el nuevo `no-store` también se aplique una vez deployado, pero **queda pendiente confirmarlo con un `curl -sI` real contra producción después del deploy**, antes de dar este punto por cerrado.
+
+3. **Reverificación del slug original que generó el hallazgo** (`gestion-evidencias-iso-27001-trazabilidad`, no el que se usó en la verificación anterior):
+
+   | | `tecdex.net/.../` (origen) | `isos.tecdex.net/blog/...` (proxy) |
+   |---|---|---|
+   | ETag | `"1152-1784900136;;;"` | `"1152-1784900136;;;"` |
+   | `x-litespeed-cache` | `hit` | `hit` (passthrough del origen) |
+   | `cache-control` | `no-cache` | `no-cache` |
+   | `x-vercel-cache` | — | `MISS` |
+
+   El ETag viejo reportado originalmente (`996-1784848310`) **ya no aparece en ninguna de las dos URLs** — ambas coinciden hoy en `1152-1784900136`, consistente entre origen y proxy. **Esto confirma que el hallazgo queda cerrado**: el contenido está sincronizado en ambos lados, y el proxy de Vercel sigue sin cachear (`MISS`), tal como se documentó arriba. El ETag viejo probablemente correspondía a una purga de LiteSpeed que aún no había terminado de propagar en el momento del chequeo externo original (candidato 3 de la lista de arriba), no a un problema persistente de caché en Vercel ni en WordPress.
+
 ## 6.6. Qué sitio mide realmente el "Site Speed" de Soro (verificado 2026-07-23)
 
 Duda planteada por Mario: el checker de velocidad del dashboard de Soro mostraba 46/100 — un número que no calzaba con las mediciones previas de `isos.tecdex.net` (96/100 mobile, LCP 2.4s).

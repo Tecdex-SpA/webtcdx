@@ -19,6 +19,20 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Defensivo: /blog/:slug es un proxy puro hacia WordPress (ver
+        // rewrites() abajo). El contenido vive y se actualiza en WordPress,
+        // así que esta ruta nunca debería quedar cacheada del lado de
+        // Vercel, sin importar qué Cache-Control mande el origen hoy o en
+        // el futuro. Ver docs/seo-iso/brief-seo-iso-2026-07.md sección 6.5.
+        source: "/blog/:slug",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store",
+          },
+        ],
+      },
     ];
   },
   async rewrites() {
