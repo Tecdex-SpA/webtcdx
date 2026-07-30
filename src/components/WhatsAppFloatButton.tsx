@@ -1,14 +1,26 @@
-const WHATSAPP_NUMBER = "56989995290";
-const WHATSAPP_MESSAGE = "Hola, quiero más información sobre TCDX Compliance.";
+"use client";
+
+import { usePathname } from "next/navigation";
+import { getWhatsAppUrl } from "@/lib/contact";
+import { trackContactEvent } from "@/lib/analytics";
 
 export function WhatsAppFloatButton() {
-  const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+  const pathname = usePathname();
+  const href = getWhatsAppUrl();
+
+  const handleClick = () => {
+    trackContactEvent("whatsapp_floating_button_click", {
+      page_path: pathname ?? "/",
+      source: "floating_button",
+    });
+  };
 
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       aria-label="Escríbenos por WhatsApp"
       className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
     >
