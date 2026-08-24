@@ -1,26 +1,20 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { getWhatsAppUrl } from "@/lib/contact";
-import { trackContactEvent } from "@/lib/analytics";
+import { getWhatsAppRedirectUrl } from "@/lib/contact";
+import { contentIdFromPath } from "@/lib/analytics";
 
 export function WhatsAppFloatButton() {
   const pathname = usePathname();
-  const href = getWhatsAppUrl();
-
-  const handleClick = () => {
-    trackContactEvent("whatsapp_floating_button_click", {
-      page_path: pathname ?? "/",
-      source: "floating_button",
-    });
-  };
+  const contentId = contentIdFromPath(pathname ?? "/");
+  const href = getWhatsAppRedirectUrl(contentId, "direct", "sticky");
 
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={handleClick}
+      data-analytics-event="whatsapp_click"
+      data-content-id={contentId}
+      data-placement="sticky"
       aria-label="Escríbenos por WhatsApp"
       className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
     >

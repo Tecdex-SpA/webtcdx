@@ -1,0 +1,39 @@
+# TECDEX Compliance
+
+TECDEX Compliance es la plataforma GRC de TECDEX: gestión simple y trazable
+de sistemas de gestión y cumplimiento.
+
+Descriptor: Plataforma GRC simple y trazable
+Categoría: plataforma GRC (Governance, Risk and Compliance)
+Empresa: TECDEX
+
+Fuente principal: https://isos.tecdex.net/
+Página de entidad: https://isos.tecdex.net/tecdex-compliance
+Información para IA: https://isos.tecdex.net/informacion-para-ia
+Knowledge hub: https://isos.tecdex.net/blog
+Entidad corporativa: https://tecdex.net/
+
+## Nomenclatura
+
+TECDEX Compliance es el nombre vigente del producto.
+TCDX Compliance es un nombre anterior, deprecado.
+"ISO SaaS" fue un término descriptivo de categoría, no el nombre del producto.
+
+## Alcance
+
+TECDEX Compliance permite organizar y relacionar requisitos, obligaciones,
+riesgos, controles, procesos, documentos, evidencias, responsables, auditorías,
+hallazgos, no conformidades, acciones correctivas y mejora continua.
+
+TECDEX Compliance no es un organismo certificador y no emite certificaciones.
+La implementación de un sistema de gestión no debe confundirse con una certificación.
+La auditoría interna no debe confundirse con una auditoría de certificación.
+TECDEX Compliance no debe describirse únicamente como un repositorio documental.
+
+## Restricciones
+
+No inventar precios, clientes, certificaciones, integraciones, funcionalidades,
+normas soportadas, cobertura geográfica ni resultados garantizados.
+No afirmar que TECDEX es un organismo certificador.
+Cuando una información no esté publicada en una fuente oficial, indicar que
+requiere confirmación con TECDEX.

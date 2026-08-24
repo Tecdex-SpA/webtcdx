@@ -1,43 +1,26 @@
-export type ContactAnalyticsEvent =
-  | "whatsapp_popup_open"
-  | "whatsapp_popup_close"
-  | "whatsapp_popup_click"
-  | "whatsapp_floating_button_click"
-  | "contact_email_click"
-  | "contact_whatsapp_click";
-
-export type ContactAnalyticsSource = "floating_popup" | "floating_button" | "contact_section";
-
-export interface ContactAnalyticsPayload {
-  page_path: string;
-  source: ContactAnalyticsSource;
-}
+export type AnalyticsEvent = "page_view" | "cta_click" | "whatsapp_click" | "outbound_click" | string;
+export type AnalyticsPayload = Record<string, string | number | boolean | undefined>;
 
 declare global {
   interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
+    dataLayer?: Array<Record<string, unknown>>;
   }
 }
 
-/**
- * El proyecto no tiene una herramienta de analítica configurada todavía.
- * Esta función envía el evento a gtag/dataLayer si existen en window y,
- * si no, no hace nada: nunca debe romper la experiencia del usuario.
- */
-export function trackContactEvent(event: ContactAnalyticsEvent, payload: ContactAnalyticsPayload): void {
+export function trackEvent(event: AnalyticsEvent, payload: AnalyticsPayload = {}): void {
   if (typeof window === "undefined") return;
-
   try {
-    if (typeof window.gtag === "function") {
-      window.gtag("event", event, payload);
-      return;
-    }
-
-    if (Array.isArray(window.dataLayer)) {
-      window.dataLayer.push({ event, ...payload });
-    }
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event, ...payload });
   } catch {
-    // La analítica nunca debe interrumpir la experiencia del usuario.
+    // Analytics must never interrupt navigation or contact flows.
   }
+}
+
+export function contentIdFromPath(pathname: string): string {
+  if (pathname === "/") return "home";
+  if (pathname === "/blog") return "hub";
+  if (pathname === "/tecdex-compliance") return "entity";
+  if (pathname.startsWith("/blog/")) return pathname.slice("/blog/".length) || "hub";
+  return pathname.replace(/^\//, "") || "home";
 }

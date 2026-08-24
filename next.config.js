@@ -1,7 +1,16 @@
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "tecdex.net",
+        pathname: "/wp-content/uploads/**",
+      },
+    ],
+  },
   async headers() {
-    // Solución temporal: permitir que isos.tecdex.net (TCDX Compliance) se
+    // Solución temporal: permitir que isos.tecdex.net (TECDEX Compliance) se
     // embeba en un iframe SOLO desde tecdex.net, para reutilizar el widget
     // de Zoho SalesIQ del sitio padre mientras se desarrolla el nuevo chatbot.
     // Ver: https://tecdex.net/iso/
@@ -16,21 +25,6 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value:
               "frame-ancestors 'self' https://tecdex.net https://www.tecdex.net",
-          },
-        ],
-      },
-      {
-        // Defensivo: /blog/:slug es un proxy puro hacia WordPress mediante
-        // el Route Handler en src/app/blog/[slug]/route.ts. El contenido vive
-        // y se actualiza en WordPress,
-        // así que esta ruta nunca debería quedar cacheada del lado de
-        // Vercel, sin importar qué Cache-Control mande el origen hoy o en
-        // el futuro. Ver docs/seo-iso/brief-seo-iso-2026-07.md sección 6.5.
-        source: "/blog/:slug",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "no-store",
           },
         ],
       },

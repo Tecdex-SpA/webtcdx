@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import { getWhatsAppUrl } from "@/lib/contact";
-import { trackContactEvent } from "@/lib/analytics";
+import { getWhatsAppRedirectUrl } from "@/lib/contact";
+import { contentIdFromPath, trackEvent } from "@/lib/analytics";
 
 const SESSION_KEY = "tcdx-whatsapp-popup-dismissed";
 const SHOW_AFTER_MS = 10000;
@@ -13,6 +13,7 @@ const SCROLL_THRESHOLD_RATIO = 0.4;
 export function WhatsAppPopup() {
   const pathname = usePathname();
   const page_path = pathname ?? "/";
+  const contentId = contentIdFromPath(page_path);
   const [visible, setVisible] = useState(false);
   const triggeredRef = useRef(false);
 
@@ -24,7 +25,7 @@ export function WhatsAppPopup() {
       if (triggeredRef.current) return;
       triggeredRef.current = true;
       setVisible(true);
-      trackContactEvent("whatsapp_popup_open", { page_path, source: "floating_popup" });
+      trackEvent("whatsapp_popup_open", { content_id: contentId, placement: "sticky" });
     };
 
     const timer = window.setTimeout(trigger, SHOW_AFTER_MS);
@@ -43,18 +44,17 @@ export function WhatsAppPopup() {
       window.clearTimeout(timer);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [page_path]);
+  }, [contentId]);
 
   const handleClose = useCallback(() => {
     setVisible(false);
     window.sessionStorage.setItem(SESSION_KEY, "1");
-    trackContactEvent("whatsapp_popup_close", { page_path, source: "floating_popup" });
-  }, [page_path]);
+    trackEvent("whatsapp_popup_close", { content_id: contentId, placement: "sticky" });
+  }, [contentId]);
 
   const handleCtaClick = useCallback(() => {
-    trackContactEvent("whatsapp_popup_click", { page_path, source: "floating_popup" });
     window.sessionStorage.setItem(SESSION_KEY, "1");
-  }, [page_path]);
+  }, []);
 
   useEffect(() => {
     if (!visible) return;
@@ -69,7 +69,7 @@ export function WhatsAppPopup() {
 
   if (!visible) return null;
 
-  const whatsappUrl = getWhatsAppUrl();
+  const whatsappUrl = getWhatsAppRedirectUrl(contentId, "direct", "sticky");
 
   return (
     <div
@@ -89,21 +89,22 @@ export function WhatsAppPopup() {
 
       <p className="pr-8 text-base font-bold text-brand-slate">Hola 👋 ¿Necesitas ayuda?</p>
       <p id="tcdx-whatsapp-popup-description" className="mt-2 text-sm leading-6 text-brand-muted">
-        Nuestro asistente de IA puede orientarte sobre TCDX Compliance, las normas disponibles y las alternativas para tu empresa.
+        Nuestro asistente de IA puede orientarte sobre TECDEX Compliance y las alternativas para tu empresa.
       </p>
 
       <a
         href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
         onClick={handleCtaClick}
+        data-analytics-event="whatsapp_click"
+        data-content-id={contentId}
+        data-placement="sticky"
         className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
       >
         Escribir por WhatsApp
       </a>
 
       <p className="mt-3 text-xs leading-5 text-brand-muted">
-        La atención inicial es realizada por inteligencia artificial. Cuando sea necesario, la conversación podrá ser continuada por un especialista de Tecdex.
+        La atención inicial es realizada por inteligencia artificial. Cuando sea necesario, la conversación podrá ser continuada por un especialista de TECDEX.
       </p>
     </div>
   );

@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "TCDX Compliance, plataforma ISO 27001, 9001 y 42001 en Chile";
+export const alt = "TECDEX Compliance, plataforma GRC simple y trazable";
 export const size = {
   width: 1200,
   height: 630,
@@ -53,7 +53,7 @@ export default function OpenGraphImage() {
               lineHeight: 1,
             }}
           >
-            TCDX Compliance
+            TECDEX Compliance
           </div>
           <div
             style={{

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { RouteRenderer } from "@/components/RouteRenderer";
+import Script from "next/script";
+import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { WhatsAppFloatButton } from "@/components/WhatsAppFloatButton";
 import { WhatsAppPopup } from "@/components/WhatsAppPopup";
 import "./globals.css";
@@ -9,31 +10,12 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://isos.tecdex.net"),
-  alternates: {
-    canonical: "https://isos.tecdex.net",
-  },
   title: {
-    default: "Plataforma ISO 27001, 9001 y 42001 en Chile | TCDX Compliance — TecDex",
-    template: "%s | TCDX Compliance",
+    default: "TECDEX Compliance | Plataforma GRC simple y trazable",
+    template: "%s | TECDEX Compliance",
   },
   description:
-    "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
-  keywords: [
-    "TCDX Compliance",
-    "TECDEX",
-    "plataforma ISO Chile",
-    "software ISO Chile",
-    "plataforma ISO para empresas",
-    "gestión ISO 27001",
-    "plataforma ISO 27001",
-    "gestión normativa Chile",
-    "software cumplimiento normativo",
-    "cumplimiento normativo",
-    "auditoría normativa",
-    "evidencias de cumplimiento",
-    "matriz de riesgos",
-    "reportes ejecutivos",
-  ],
+    "Plataforma GRC simple y trazable para organizar controles, evidencias, riesgos, auditorías y acciones.",
   authors: [{ name: "TECDEX" }],
   creator: "TECDEX",
   publisher: "TECDEX",
@@ -54,102 +36,64 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Plataforma ISO 27001, 9001 y 42001 en Chile | TCDX Compliance — TecDex",
-    description:
-      "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
-    url: "https://isos.tecdex.net",
-    siteName: "TCDX Compliance",
+    title: "TECDEX Compliance | Plataforma GRC simple y trazable",
+    description: "Plataforma GRC simple y trazable desarrollada por TECDEX.",
+    siteName: "TECDEX Compliance",
     type: "website",
     locale: "es_CL",
-    images: [
-      {
-        url: "/opengraph-image",
-        width: 1200,
-        height: 630,
-        alt: "TCDX Compliance, plataforma ISO 27001, 9001 y 42001 en Chile",
-      },
-    ],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "TECDEX Compliance" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Plataforma ISO 27001, 9001 y 42001 en Chile | TCDX Compliance — TecDex",
-    description:
-      "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
+    title: "TECDEX Compliance | Plataforma GRC simple y trazable",
+    description: "Plataforma GRC simple y trazable desarrollada por TECDEX.",
     images: ["/opengraph-image"],
   },
 };
 
-const softwareApplicationJsonLd = {
+const globalJsonLd = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "TCDX Compliance",
-  url: "https://tecdex.net/iso",
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  description:
-    "Software de gestión normativa para ISO 27001, 9001 y 42001: controles, evidencias, matriz de riesgos, auditorías y reportes ejecutivos. Plataforma SaaS chilena con onboarding asistido por TecDex.",
-  publisher: {
-    "@type": "Organization",
-    name: "TecDex",
-    url: "https://tecdex.net",
-  },
-};
-
-const faqPageJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    [
-      "¿TCDX Compliance certifica automáticamente a una empresa?",
-      "No. La plataforma ayuda a ordenar, operar y preparar mejor la gestión normativa, pero no emite certificaciones ni reemplaza a una casa certificadora.",
-    ],
-    [
-      "¿IA Auditor reemplaza a un auditor o consultor?",
-      "No. IA Auditor funciona como apoyo de análisis y orientación. Sus resultados deben ser revisados por responsables humanos, consultores o auditores según corresponda.",
-    ],
-    [
-      "¿Por qué partir con 1 o 2 normativas?",
-      "En etapa inicial recomendamos un alcance controlado para configurar bien procesos, evidencias, responsables y reportes antes de escalar.",
-    ],
-    [
-      "¿Los usuarios tienen límite?",
-      "En la oferta fundadora no se define un límite comercial inicial de usuarios. El alcance se revisa durante la evaluación comercial y el onboarding.",
-    ],
-    [
-      "¿La plataforma sirve para ISO 27001, 9001 y 42001?",
-      "Sí. TCDX Compliance está diseñada para ISO 9001 (calidad), ISO 27001 (seguridad de la información) e ISO 42001 (gestión de IA), permitiendo 1 o 2 normativas por cliente en etapa inicial.",
-    ],
-  ].map(([question, answer]) => ({
-    "@type": "Question",
-    name: question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: answer,
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://tecdex.net/#organization",
+      name: "TECDEX",
+      url: "https://tecdex.net/",
     },
-  })),
+    {
+      "@type": "WebSite",
+      "@id": "https://isos.tecdex.net/#website",
+      url: "https://isos.tecdex.net/",
+      name: "TECDEX Compliance",
+      publisher: { "@id": "https://tecdex.net/#organization" },
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-CL">
       <head>
-        <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
-        <link rel="shortcut icon" href="/favicon.svg?v=2" type="image/svg+xml" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(softwareApplicationJsonLd).replace(/</g, "\\u003c"),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(globalJsonLd).replace(/</g, "\\u003c") }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(faqPageJsonLd).replace(/</g, "\\u003c"),
-          }}
-        />
+        <Script id="gtm-loader" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-WT7HRSGR');`}
+        </Script>
       </head>
       <body className={inter.className}>
-        <RouteRenderer>{children}</RouteRenderer>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-WT7HRSGR"
+            height="0"
+            width="0"
+            className="hidden"
+            title="Google Tag Manager"
+          />
+        </noscript>
+        <AnalyticsProvider />
+        {children}
         <WhatsAppFloatButton />
         <WhatsAppPopup />
       </body>

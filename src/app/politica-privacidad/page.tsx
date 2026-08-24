@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Política de Privacidad",
   description:
-    "Política de privacidad de TCDX Compliance, plataforma SaaS de TECDEX SpA.",
+    "Política de privacidad de TECDEX Compliance, plataforma GRC de TECDEX SpA.",
 };
 
 const updatedAt = "11 de mayo de 2026";
@@ -29,13 +29,13 @@ export default function PrivacyPolicyPage() {
       <section className="bg-brand-navy py-16 text-white sm:py-20">
         <div className="section-shell max-w-5xl">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-brand-sky">
-            TCDX Compliance
+            TECDEX Compliance
           </p>
           <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
             Política de Privacidad
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-white/70 sm:text-lg">
-            Esta política informa cómo TECDEX SpA recopila, utiliza, almacena y protege los datos personales entregados a través del sitio web comercial de TCDX Compliance.
+            Esta política informa cómo TECDEX SpA recopila, utiliza, almacena y protege los datos personales entregados a través del sitio web comercial de TECDEX Compliance.
           </p>
           <p className="mt-4 text-sm text-white/50">Última actualización: {updatedAt}</p>
         </div>
@@ -72,7 +72,7 @@ export default function PrivacyPolicyPage() {
               <p>Los datos personales podrán ser tratados para las siguientes finalidades:</p>
               <ul>
                 <li>Responder solicitudes de contacto, información o demo comercial.</li>
-                <li>Evaluar el interés comercial en TCDX Compliance.</li>
+                <li>Evaluar el interés comercial en TECDEX Compliance.</li>
                 <li>Coordinar reuniones, presentaciones, demos o evaluaciones comerciales.</li>
                 <li>Enviar información relacionada con productos, servicios, propuestas o novedades de TECDEX, cuando corresponda.</li>
                 <li>Mantener registros comerciales, administrativos y de seguimiento.</li>
@@ -137,7 +137,7 @@ export default function PrivacyPolicyPage() {
 
               <h2>12. Información sobre IA Auditor</h2>
               <p>
-                IA Auditor es una funcionalidad de apoyo al análisis y orientación dentro de TCDX Compliance. No reemplaza auditorías certificadoras, consultores, auditores ni responsables internos. En el sitio comercial, cualquier dato entregado a través de formularios será tratado con fines comerciales y de contacto, no para decisiones automatizadas con efectos legales sobre el titular.
+                IA Auditor es una funcionalidad de apoyo al análisis y orientación dentro de TECDEX Compliance. No reemplaza auditorías certificadoras, consultores, auditores ni responsables internos. En el sitio comercial, cualquier dato entregado a través de formularios será tratado con fines comerciales y de contacto, no para decisiones automatizadas con efectos legales sobre el titular.
               </p>
 
               <h2>13. Menores de edad</h2>
