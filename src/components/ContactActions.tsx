@@ -45,7 +45,7 @@ export function ContactActions({
       <div className="flex flex-col gap-3 sm:flex-row">
         <a
           href={whatsappUrl}
-          data-analytics-event="whatsapp_click"
+          data-analytics-event="cta_click"
           data-content-id={contentId}
           data-placement="body"
           className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-4 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#20bd5a]"

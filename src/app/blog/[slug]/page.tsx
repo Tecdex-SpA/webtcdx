@@ -132,7 +132,7 @@ export default async function ArticlePage({ params }: PageProps) {
             <a
               className="mt-5 inline-flex rounded-full bg-white px-5 py-3 font-semibold text-brand-navy"
               href={`/go/whatsapp?content_id=${canonicalSlug}&source=organic&placement=body`}
-              data-analytics-event="whatsapp_click"
+              data-analytics-event="cta_click"
               data-content-id={canonicalSlug}
               data-placement="body"
             >

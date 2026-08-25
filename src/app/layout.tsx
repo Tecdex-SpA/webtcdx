@@ -7,6 +7,9 @@ import { WhatsAppPopup } from "@/components/WhatsAppPopup";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+const ga4MeasurementId = process.env.GA4_MEASUREMENT_ID?.trim();
+const validGa4MeasurementId =
+  ga4MeasurementId && /^G-[A-Z0-9]+$/.test(ga4MeasurementId) ? ga4MeasurementId : undefined;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://isos.tecdex.net"),
@@ -81,6 +84,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="gtm-loader" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-WT7HRSGR');`}
         </Script>
+        {validGa4MeasurementId ? (
+          <>
+            <Script id="ga4-init" strategy="beforeInteractive">
+              {`window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};window.gtag('js',new Date());window.gtag('config',${JSON.stringify(validGa4MeasurementId)},{send_page_view:false});`}
+            </Script>
+            <Script
+              id="ga4-loader"
+              src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(validGa4MeasurementId)}`}
+              strategy="afterInteractive"
+            />
+          </>
+        ) : null}
       </head>
       <body className={inter.className}>
         <noscript>

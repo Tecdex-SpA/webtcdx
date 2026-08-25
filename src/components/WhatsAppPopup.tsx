@@ -95,7 +95,7 @@ export function WhatsAppPopup() {
       <a
         href={whatsappUrl}
         onClick={handleCtaClick}
-        data-analytics-event="whatsapp_click"
+        data-analytics-event="cta_click"
         data-content-id={contentId}
         data-placement="sticky"
         className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"

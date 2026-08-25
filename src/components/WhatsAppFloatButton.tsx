@@ -12,7 +12,7 @@ export function WhatsAppFloatButton() {
   return (
     <a
       href={href}
-      data-analytics-event="whatsapp_click"
+      data-analytics-event="cta_click"
       data-content-id={contentId}
       data-placement="sticky"
       aria-label="Escríbenos por WhatsApp"

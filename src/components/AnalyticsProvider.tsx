@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { contentIdFromPath, trackEvent } from "@/lib/analytics";
 
@@ -15,14 +15,19 @@ function inferPlacement(anchor: HTMLAnchorElement): string {
 function AnalyticsEffects() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const search = searchParams.toString();
+  const lastPageView = useRef<string | null>(null);
 
   useEffect(() => {
+    const pageLocation = window.location.href;
+    if (lastPageView.current === pageLocation) return;
+    lastPageView.current = pageLocation;
     trackEvent("page_view", {
-      page_location: window.location.href,
+      page_location: pageLocation,
       page_title: document.title,
       content_id: contentIdFromPath(pathname),
     });
-  }, [pathname, searchParams]);
+  }, [pathname, search]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -35,17 +40,23 @@ function AnalyticsEffects() {
       const declaredEvent = target.dataset.analyticsEvent;
 
       if (declaredEvent === "whatsapp_click" || target.pathname === "/go/whatsapp") {
-        const destinationUrl = new URL(destination);
-        trackEvent("whatsapp_click", {
-          content_id: destinationUrl.searchParams.get("content_id") || contentId,
-          source: destinationUrl.searchParams.get("source") || "direct",
-          placement: destinationUrl.searchParams.get("placement") || placement,
-          campaign: destinationUrl.searchParams.get("campaign") || undefined,
+        trackEvent("cta_click", {
+          content_id: contentId,
+          placement,
+          cta_label: target.dataset.ctaLabel || target.textContent?.trim() || target.ariaLabel || "WhatsApp",
+          destination: "whatsapp",
         });
         return;
       }
 
-      if (declaredEvent === "cta_click" || target.dataset.ctaLabel) {
+      const isCta =
+        declaredEvent === "cta_click" ||
+        Boolean(target.dataset.ctaLabel) ||
+        target.classList.contains("rounded-full") ||
+        target.hash === "#contacto" ||
+        target.hash === "#fundadores";
+
+      if (isCta) {
         trackEvent("cta_click", {
           content_id: contentId,
           placement,

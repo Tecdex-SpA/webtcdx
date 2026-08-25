@@ -4,14 +4,19 @@ export type AnalyticsPayload = Record<string, string | number | boolean | undefi
 declare global {
   interface Window {
     dataLayer?: Array<Record<string, unknown>>;
+    gtag?: (command: "event", eventName: string, payload?: AnalyticsPayload) => void;
   }
 }
 
 export function trackEvent(event: AnalyticsEvent, payload: AnalyticsPayload = {}): void {
   if (typeof window === "undefined") return;
+  // whatsapp_click is authoritative server-side in /go/whatsapp. Blocking it
+  // here prevents accidental client-side double counting.
+  if (event === "whatsapp_click") return;
   try {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({ event, ...payload });
+    window.gtag?.("event", event, payload);
   } catch {
     // Analytics must never interrupt navigation or contact flows.
   }
