@@ -1,41 +1,184 @@
 import { randomUUID } from "node:crypto";
 
-const MEASUREMENT_ID = "G-FCBC6HZ3M5";
 const WHATSAPP_NUMBER = "56989995290";
+const UNKNOWN_VALUE = "unknown";
+const DIAGNOSTIC_MAX_LENGTH = 50;
+const GA4_TIMEOUT_MS = 1500;
+
 const VALID_SOURCES = new Set(["organic", "instagram", "facebook", "linkedin", "direct", "referral"]);
 const VALID_PLACEMENTS = new Set(["hero", "body", "footer", "sticky", "related"]);
+const KNOWN_ARTICLE_SLUGS = new Set([
+  "beneficios-gestion-centralizada-identidades",
+  "gestion-evidencias-iso-27001-trazabilidad",
+  "iso-9001-2026-que-cambia-como-prepararse",
+  "jumpcloud-control-acceso-iso-27001",
+  "matriz-de-riesgos-y-controles",
+  "migrar-planillas-a-plataforma-iso",
+  "pentesting-continuo-iso-27001",
+  "plataforma-gestion-iso-controlar-evidencias",
+  "plataforma-iso-27001-ordenar-cumplimiento",
+  "plataforma-iso-9001-ordenar-cumplimiento",
+  "plataforma-para-mantener-certificacion-iso",
+  "seguridad-apis-publicas-empresariales-control",
+  "sistema-gestion-vs-proyecto-certificacion",
+  "software-iso-27001-control-evidencias-riesgos",
+  "software-para-auditorias-internas",
+  "superficie-ataque-externa-iso-27001",
+]);
+const KNOWN_STATIC_CONTENT_IDS = new Set([
+  "home",
+  "hub",
+  "entity",
+  "gracias",
+  "informacion-para-ia",
+  "politica-privacidad",
+]);
 
-function safeParameter(value: string | null, maxLength: number): string | undefined {
-  if (!value) return undefined;
-  const trimmed = value.trim();
-  if (!trimmed || trimmed.length > maxLength || /[\r\n]/.test(trimmed)) return undefined;
-  return trimmed;
-}
+const LEGACY_ARTICLE_SLUG = "migrar-planillas-tcdx-compliance";
+const MIGRATED_ARTICLE_SLUG = "migrar-planillas-a-plataforma-iso";
 
-function naturalMessage(contentId: string): string {
-  const isReadableSlug = /^[a-z0-9áéíóúñ]+(?:-[a-z0-9áéíóúñ]+)+$/i.test(contentId);
-  if (isReadableSlug) {
-    const topic = contentId.replace(/-/g, " ");
-    return `Hola, vengo del artículo sobre ${topic} y me gustaría saber más sobre TECDEX Compliance.`;
-  }
-  return "Hola, visité TECDEX Compliance y me gustaría recibir más información.";
-}
+type InputField = "content_id" | "source" | "placement" | "campaign";
 
-async function sendMeasurementEvent(params: {
+type ParsedInput = {
+  present: boolean;
+  valid: boolean;
+  value?: string;
+  diagnostic?: string;
+};
+
+type NormalizedParams = {
   contentId: string;
   source: string;
   placement?: string;
   campaign?: string;
-}) {
+  paramsNormalized: boolean;
+  invalidParams: string;
+  diagnostics: Record<string, string>;
+};
+
+function diagnosticValue(value: string): string | undefined {
+  const sanitized = value
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, DIAGNOSTIC_MAX_LENGTH);
+  return sanitized || undefined;
+}
+
+function parseInput(value: string | null, maxLength: number): ParsedInput {
+  if (value === null) return { present: false, valid: false };
+
+  const trimmed = value.trim();
+  const hasControlCharacters = /[\u0000-\u001f\u007f-\u009f]/.test(value);
+  const valid = Boolean(trimmed) && trimmed.length <= maxLength && !hasControlCharacters;
+
+  return {
+    present: true,
+    valid,
+    value: valid ? trimmed : undefined,
+    diagnostic: diagnosticValue(value),
+  };
+}
+
+function normalizeRequest(url: URL): NormalizedParams {
+  const contentInput = parseInput(url.searchParams.get("content_id"), 160);
+  const sourceInput = parseInput(url.searchParams.get("source"), 32);
+  const placementInput = parseInput(url.searchParams.get("placement"), 32);
+  const campaignInput = parseInput(url.searchParams.get("campaign"), 160);
+  const normalizedFields = new Set<InputField>();
+  const diagnostics: Record<string, string> = {};
+
+  const markNormalized = (field: InputField, input: ParsedInput) => {
+    normalizedFields.add(field);
+    if (input.diagnostic) diagnostics[`original_${field}`] = input.diagnostic;
+  };
+
+  let contentId = UNKNOWN_VALUE;
+  if (contentInput.valid && contentInput.value) {
+    const lowered = contentInput.value.toLowerCase();
+    const canonical = lowered === LEGACY_ARTICLE_SLUG ? MIGRATED_ARTICLE_SLUG : lowered;
+    if (KNOWN_ARTICLE_SLUGS.has(canonical) || KNOWN_STATIC_CONTENT_IDS.has(canonical)) {
+      contentId = canonical;
+      if (contentInput.value !== canonical) markNormalized("content_id", contentInput);
+    } else {
+      markNormalized("content_id", contentInput);
+    }
+  } else {
+    markNormalized("content_id", contentInput);
+  }
+
+  let source = UNKNOWN_VALUE;
+  if (sourceInput.valid && sourceInput.value) {
+    const lowered = sourceInput.value.toLowerCase();
+    if (VALID_SOURCES.has(lowered)) {
+      source = lowered;
+      if (sourceInput.value !== lowered) markNormalized("source", sourceInput);
+    } else {
+      markNormalized("source", sourceInput);
+    }
+  } else {
+    markNormalized("source", sourceInput);
+  }
+
+  let placement: string | undefined;
+  if (placementInput.present) {
+    if (placementInput.valid && placementInput.value) {
+      const lowered = placementInput.value.toLowerCase();
+      if (VALID_PLACEMENTS.has(lowered)) {
+        placement = lowered;
+        if (placementInput.value !== lowered) markNormalized("placement", placementInput);
+      } else {
+        markNormalized("placement", placementInput);
+      }
+    } else {
+      markNormalized("placement", placementInput);
+    }
+  }
+
+  let campaign: string | undefined;
+  if (campaignInput.present) {
+    if (campaignInput.valid && campaignInput.value) {
+      campaign = campaignInput.value;
+    } else {
+      markNormalized("campaign", campaignInput);
+    }
+  }
+
+  const invalidParams = Array.from(normalizedFields).join(",") || "none";
+  return {
+    contentId,
+    source,
+    placement,
+    campaign,
+    paramsNormalized: normalizedFields.size > 0,
+    invalidParams,
+    diagnostics,
+  };
+}
+
+function naturalMessage(contentId: string): string {
+  if (KNOWN_ARTICLE_SLUGS.has(contentId)) {
+    const topic = contentId.replace(/-/g, " ");
+    return `Hola, vengo del artículo sobre ${topic} y me gustaría saber más sobre TECDEX Compliance.`;
+  }
+  return "Hola, me gustaría saber más sobre TECDEX Compliance.";
+}
+
+async function sendMeasurementEvent(params: NormalizedParams): Promise<boolean> {
+  const measurementId = process.env.GA4_MEASUREMENT_ID;
   const apiSecret = process.env.GA4_API_SECRET;
-  if (!apiSecret) {
-    console.warn("[analytics] GA4_API_SECRET is not configured; server-side whatsapp_click was not sent.");
+  if (!measurementId || !apiSecret) {
+    console.error("[analytics] GA4 Measurement Protocol is not configured; whatsapp_click was not sent.");
     return false;
+  }
+
+  if (params.paramsNormalized) {
+    console.warn(`[analytics] whatsapp_click normalized parameters: ${params.invalidParams}.`);
   }
 
   try {
     const endpoint = new URL("https://www.google-analytics.com/mp/collect");
-    endpoint.searchParams.set("measurement_id", MEASUREMENT_ID);
+    endpoint.searchParams.set("measurement_id", measurementId);
     endpoint.searchParams.set("api_secret", apiSecret);
     const response = await fetch(endpoint, {
       method: "POST",
@@ -50,13 +193,23 @@ async function sendMeasurementEvent(params: {
               source: params.source,
               placement: params.placement,
               campaign: params.campaign,
+              params_normalized: params.paramsNormalized ? "true" : "false",
+              invalid_params: params.invalidParams,
+              ...params.diagnostics,
               engagement_time_msec: 1,
             },
           },
         ],
       }),
       cache: "no-store",
+      signal: AbortSignal.timeout(GA4_TIMEOUT_MS),
     });
+
+    if (!response.ok) {
+      console.error(`[analytics] GA4 Measurement Protocol returned ${response.status}.`);
+    } else if (params.paramsNormalized) {
+      console.info("[analytics] whatsapp_click with normalized parameters was sent.");
+    }
     return response.ok;
   } catch {
     console.error("[analytics] Failed to send server-side whatsapp_click.");
@@ -65,26 +218,11 @@ async function sendMeasurementEvent(params: {
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const contentId = safeParameter(url.searchParams.get("content_id"), 160);
-  const source = safeParameter(url.searchParams.get("source"), 32);
-  const placement = safeParameter(url.searchParams.get("placement"), 32);
-  const campaign = safeParameter(url.searchParams.get("campaign"), 160);
-
-  if (!contentId || !source || !VALID_SOURCES.has(source)) {
-    return Response.json(
-      { error: "content_id and a valid source are required" },
-      { status: 400, headers: { "cache-control": "no-store" } },
-    );
-  }
-  if (placement && !VALID_PLACEMENTS.has(placement)) {
-    return Response.json({ error: "invalid placement" }, { status: 400, headers: { "cache-control": "no-store" } });
-  }
-
-  await sendMeasurementEvent({ contentId, source, placement, campaign });
+  const params = normalizeRequest(new URL(request.url));
+  await sendMeasurementEvent(params);
 
   const destination = new URL(`https://wa.me/${WHATSAPP_NUMBER}`);
-  destination.searchParams.set("text", naturalMessage(contentId));
+  destination.searchParams.set("text", naturalMessage(params.contentId));
 
   return new Response(null, {
     status: 302,
