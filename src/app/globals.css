@@ -119,17 +119,19 @@ header nav a:focus-visible::after {
   transform: scaleX(1);
 }
 
-header .section-shell > a:first-child {
+header[data-embedded-chrome] .section-shell > a:first-child {
   width: 220px;
   height: 58px;
   background-image: url('https://tecdex.net/wp-content/uploads/2019/08/logo-luz.svg');
   background-repeat: no-repeat;
   background-position: left center;
   background-size: contain;
+  color: transparent;
+  font-size: 0;
   flex: 0 0 auto;
 }
 
-header .section-shell > a:first-child > * {
+header[data-embedded-chrome] .section-shell > a:first-child > * {
   display: none;
 }
 
