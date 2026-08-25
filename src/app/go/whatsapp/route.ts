@@ -202,7 +202,10 @@ function gaSessionId(request: Request, measurementId: string): number | undefine
   const suffix = measurementId.replace(/^G-/, "");
   const value = cookieValue(request, `_ga_${suffix}`);
   if (!value) return undefined;
-  const sessionId = value.match(/\$s(\d+)/)?.[1] || value.match(/^GS\d+\.\d+\.(\d+)/)?.[1];
+  const sessionId =
+    value.match(/^GS\d+\.\d+\.s(\d+)/)?.[1] ||
+    value.match(/\$s(\d+)/)?.[1] ||
+    value.match(/^GS\d+\.\d+\.(\d+)/)?.[1];
   if (!sessionId) return undefined;
   const parsed = Number(sessionId);
   return Number.isSafeInteger(parsed) ? parsed : undefined;
