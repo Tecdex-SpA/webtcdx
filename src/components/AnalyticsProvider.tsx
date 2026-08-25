@@ -12,7 +12,7 @@ function inferPlacement(anchor: HTMLAnchorElement): string {
   return "body";
 }
 
-function AnalyticsEffects() {
+function AnalyticsEffects({ measurementId }: { measurementId?: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = searchParams.toString();
@@ -36,10 +36,17 @@ function AnalyticsEffects() {
     }
 
     // GA4 Enhanced Measurement emits one page_view for App Router history
-    // changes. Set route context before that event instead of emitting a
-    // second manual page_view.
-    window.gtag?.("set", { content_id: contentId });
-  }, [pathname, search]);
+    // changes. Update this stream's route context before that event instead
+    // of emitting a second manual page_view. A config-scoped custom parameter
+    // is used because global `set` parameters are not reliably attached to
+    // Enhanced Measurement events.
+    if (measurementId) {
+      window.gtag?.("config", measurementId, {
+        send_page_view: false,
+        content_id: contentId,
+      });
+    }
+  }, [measurementId, pathname, search]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -93,10 +100,10 @@ function AnalyticsEffects() {
   return null;
 }
 
-export function AnalyticsProvider() {
+export function AnalyticsProvider({ measurementId }: { measurementId?: string }) {
   return (
     <Suspense fallback={null}>
-      <AnalyticsEffects />
+      <AnalyticsEffects measurementId={measurementId} />
     </Suspense>
   );
 }

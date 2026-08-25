@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             title="Google Tag Manager"
           />
         </noscript>
-        <AnalyticsProvider />
+        <AnalyticsProvider measurementId={validGa4MeasurementId} />
         {children}
         <WhatsAppFloatButton />
         <WhatsAppPopup />
