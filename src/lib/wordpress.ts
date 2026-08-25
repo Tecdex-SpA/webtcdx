@@ -108,5 +108,8 @@ export function rewriteCanonicalArticleLinks(html: string, posts: WpPost[]): str
   );
 }
 
-// PROXY_BYPASS_GUARD=REMOVE_OR_RETIRED: native article rendering reads the
-// WordPress REST API and no longer fetches public WordPress article URLs.
+// PROXY_BYPASS_GUARD_STATUS=STILL_ACTIVE: keep the WordPress guard and
+// TCDX_PROXY_SECRET configured throughout the redirect consolidation cycle.
+// Native rendering no longer fetches public WordPress article URLs, but guard
+// cleanup waits until the redirects are active and zero proxy dependency has
+// been verified in production.
