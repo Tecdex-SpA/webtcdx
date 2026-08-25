@@ -28,7 +28,7 @@ export function CommercialSections() {
               Un proceso claro para comenzar a operar tu gestión ISO
             </h2>
             <p className="mt-4 text-lg leading-8 text-brand-muted">
-              TCDX Compliance se implementa con un alcance inicial controlado, acompañamiento de TECDEX y foco en trazabilidad operativa.
+              TECDEX Compliance se implementa con un alcance inicial controlado, acompañamiento de TECDEX y foco en trazabilidad operativa.
             </p>
           </div>
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
@@ -68,7 +68,7 @@ export function CommercialSections() {
       <footer className="commercial-footer border-t border-white/10 bg-brand-navy py-12">
         <div className="section-shell grid gap-8 text-sm text-white/70 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
           <div>
-            <p className="text-lg font-bold text-white">TCDX Compliance</p>
+            <p className="text-lg font-bold text-white">TECDEX Compliance</p>
             <p className="mt-3 max-w-xl leading-6">
               Plataforma SaaS de TECDEX SpA para gestión ISO simple, trazable y asistida por IA bajo revisión humana.
             </p>

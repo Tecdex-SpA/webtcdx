@@ -5,7 +5,7 @@ import { CheckCircle2, Mail, ArrowRight } from "lucide-react";
 export const metadata: Metadata = {
   title: "Solicitud recibida",
   description:
-    "Gracias por solicitar una demo de TCDX Compliance. TECDEX revisará tu información y te contactará para coordinar los próximos pasos.",
+    "Gracias por solicitar una demo de TECDEX Compliance. TECDEX revisará tu información y te contactará para coordinar los próximos pasos.",
 };
 
 export default function GraciasPage() {
@@ -26,7 +26,7 @@ export default function GraciasPage() {
               Gracias por contactar a TECDEX
             </h1>
             <p className="mt-6 text-lg leading-8 text-white/75">
-              Recibimos tu solicitud de demo para TCDX Compliance. Nuestro equipo revisará la información enviada y te contactará para coordinar los próximos pasos comerciales.
+              Recibimos tu solicitud de demo para TECDEX Compliance. Nuestro equipo revisará la información enviada y te contactará para coordinar los próximos pasos comerciales.
             </p>
 
             <div className="mt-8 rounded-3xl border border-white/10 bg-white/10 p-5 text-left text-sm leading-6 text-white/70">
