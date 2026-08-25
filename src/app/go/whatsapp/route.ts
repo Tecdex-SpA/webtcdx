@@ -5,8 +5,8 @@ const UNKNOWN_VALUE = "unknown";
 const DIAGNOSTIC_MAX_LENGTH = 50;
 const GA4_TIMEOUT_MS = 1500;
 
-const VALID_SOURCES = new Set(["organic", "instagram", "facebook", "linkedin", "direct", "referral"]);
-const VALID_PLACEMENTS = new Set(["hero", "body", "footer", "sticky", "related"]);
+const VALID_SOURCE_PATTERN = /^[a-z0-9][a-z0-9._-]{0,63}$/;
+const VALID_PLACEMENTS = new Set(["hero", "body", "footer", "sticky", "sticky_bubble", "popup_cta", "related"]);
 const KNOWN_ARTICLE_SLUGS = new Set([
   "beneficios-gestion-centralizada-identidades",
   "gestion-evidencias-iso-27001-trazabilidad",
@@ -37,7 +37,7 @@ const KNOWN_STATIC_CONTENT_IDS = new Set([
 const LEGACY_ARTICLE_SLUG = "migrar-planillas-tcdx-compliance";
 const MIGRATED_ARTICLE_SLUG = "migrar-planillas-a-plataforma-iso";
 
-type InputField = "content_id" | "source" | "placement" | "campaign";
+type InputField = "content_id" | "source" | "medium" | "placement" | "campaign";
 
 type ParsedInput = {
   present: boolean;
@@ -49,6 +49,7 @@ type ParsedInput = {
 type NormalizedParams = {
   contentId: string;
   source: string;
+  medium?: string;
   placement?: string;
   campaign?: string;
   paramsNormalized: boolean;
@@ -82,7 +83,8 @@ function parseInput(value: string | null, maxLength: number): ParsedInput {
 
 function normalizeRequest(url: URL): NormalizedParams {
   const contentInput = parseInput(url.searchParams.get("content_id"), 160);
-  const sourceInput = parseInput(url.searchParams.get("source"), 32);
+  const sourceInput = parseInput(url.searchParams.get("source"), 64);
+  const mediumInput = parseInput(url.searchParams.get("medium"), 64);
   const placementInput = parseInput(url.searchParams.get("placement"), 32);
   const campaignInput = parseInput(url.searchParams.get("campaign"), 160);
   const normalizedFields = new Set<InputField>();
@@ -110,7 +112,7 @@ function normalizeRequest(url: URL): NormalizedParams {
   let source = UNKNOWN_VALUE;
   if (sourceInput.valid && sourceInput.value) {
     const lowered = sourceInput.value.toLowerCase();
-    if (VALID_SOURCES.has(lowered)) {
+    if (VALID_SOURCE_PATTERN.test(lowered)) {
       source = lowered;
       if (sourceInput.value !== lowered) markNormalized("source", sourceInput);
     } else {
@@ -118,6 +120,21 @@ function normalizeRequest(url: URL): NormalizedParams {
     }
   } else {
     markNormalized("source", sourceInput);
+  }
+
+  let medium: string | undefined;
+  if (mediumInput.present) {
+    if (mediumInput.valid && mediumInput.value) {
+      const lowered = mediumInput.value.toLowerCase();
+      if (VALID_SOURCE_PATTERN.test(lowered)) {
+        medium = lowered;
+        if (mediumInput.value !== lowered) markNormalized("medium", mediumInput);
+      } else {
+        markNormalized("medium", mediumInput);
+      }
+    } else {
+      markNormalized("medium", mediumInput);
+    }
   }
 
   let placement: string | undefined;
@@ -148,6 +165,7 @@ function normalizeRequest(url: URL): NormalizedParams {
   return {
     contentId,
     source,
+    medium,
     placement,
     campaign,
     paramsNormalized: normalizedFields.size > 0,
@@ -164,7 +182,33 @@ function naturalMessage(contentId: string): string {
   return "Hola, me gustaría saber más sobre TECDEX Compliance.";
 }
 
-async function sendMeasurementEvent(params: NormalizedParams): Promise<boolean> {
+function cookieValue(request: Request, name: string): string | undefined {
+  const cookie = request.headers.get("cookie") || "";
+  return cookie
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`))
+    ?.slice(name.length + 1);
+}
+
+function gaClientId(request: Request): string | undefined {
+  const value = cookieValue(request, "_ga");
+  if (!value) return undefined;
+  const match = value.match(/^GA\d+\.\d+\.(\d+\.\d+)$/);
+  return match?.[1];
+}
+
+function gaSessionId(request: Request, measurementId: string): number | undefined {
+  const suffix = measurementId.replace(/^G-/, "");
+  const value = cookieValue(request, `_ga_${suffix}`);
+  if (!value) return undefined;
+  const sessionId = value.match(/\$s(\d+)/)?.[1] || value.match(/^GS\d+\.\d+\.(\d+)/)?.[1];
+  if (!sessionId) return undefined;
+  const parsed = Number(sessionId);
+  return Number.isSafeInteger(parsed) ? parsed : undefined;
+}
+
+async function sendMeasurementEvent(request: Request, params: NormalizedParams): Promise<boolean> {
   const measurementId = process.env.GA4_MEASUREMENT_ID;
   const apiSecret = process.env.GA4_API_SECRET;
   if (!measurementId || !apiSecret) {
@@ -177,6 +221,9 @@ async function sendMeasurementEvent(params: NormalizedParams): Promise<boolean> 
   }
 
   try {
+    const cookieClientId = gaClientId(request);
+    const clientId = cookieClientId || randomUUID();
+    const sessionId = gaSessionId(request, measurementId);
     const endpoint = new URL("https://www.google-analytics.com/mp/collect");
     endpoint.searchParams.set("measurement_id", measurementId);
     endpoint.searchParams.set("api_secret", apiSecret);
@@ -184,19 +231,21 @@ async function sendMeasurementEvent(params: NormalizedParams): Promise<boolean> 
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        client_id: randomUUID(),
+        client_id: clientId,
         events: [
           {
             name: "whatsapp_click",
             params: {
               content_id: params.contentId,
               source: params.source,
+              medium: params.medium,
               placement: params.placement,
               campaign: params.campaign,
               params_normalized: params.paramsNormalized ? "true" : "false",
               invalid_params: params.invalidParams,
               ...params.diagnostics,
               engagement_time_msec: 1,
+              ...(sessionId ? { session_id: sessionId } : {}),
             },
           },
         ],
@@ -207,8 +256,13 @@ async function sendMeasurementEvent(params: NormalizedParams): Promise<boolean> 
 
     if (!response.ok) {
       console.error(`[analytics] GA4 Measurement Protocol returned ${response.status}.`);
-    } else if (params.paramsNormalized) {
-      console.info("[analytics] whatsapp_click with normalized parameters was sent.");
+    } else {
+      console.info(
+        `[analytics] whatsapp_click attribution context: client_id_source=${cookieClientId ? "ga_cookie" : "generated"}; session_id_forwarded=${sessionId ? "true" : "false"}.`,
+      );
+      if (params.paramsNormalized) {
+        console.info("[analytics] whatsapp_click with normalized parameters was sent.");
+      }
     }
     return response.ok;
   } catch {
@@ -219,7 +273,7 @@ async function sendMeasurementEvent(params: NormalizedParams): Promise<boolean> 
 
 export async function GET(request: Request) {
   const params = normalizeRequest(new URL(request.url));
-  await sendMeasurementEvent(params);
+  await sendMeasurementEvent(request, params);
 
   const destination = new URL(`https://wa.me/${WHATSAPP_NUMBER}`);
   destination.searchParams.set("text", naturalMessage(params.contentId));

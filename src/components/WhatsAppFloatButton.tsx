@@ -7,14 +7,14 @@ import { contentIdFromPath } from "@/lib/analytics";
 export function WhatsAppFloatButton() {
   const pathname = usePathname();
   const contentId = contentIdFromPath(pathname ?? "/");
-  const href = getWhatsAppRedirectUrl(contentId, "direct", "sticky");
+  const href = getWhatsAppRedirectUrl(contentId, "sticky_bubble");
 
   return (
     <a
       href={href}
       data-analytics-event="cta_click"
       data-content-id={contentId}
-      data-placement="sticky"
+      data-placement="sticky_bubble"
       aria-label="Escríbenos por WhatsApp"
       className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
     >

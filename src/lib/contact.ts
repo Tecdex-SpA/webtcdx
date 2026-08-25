@@ -6,13 +6,10 @@ export const contactConfig = {
 
 export function getWhatsAppRedirectUrl(
   contentId: string,
-  source: string,
   placement?: string,
-  campaign?: string,
 ): string {
-  const params = new URLSearchParams({ content_id: contentId, source });
+  const params = new URLSearchParams({ content_id: contentId });
   if (placement) params.set("placement", placement);
-  if (campaign) params.set("campaign", campaign);
   return `/go/whatsapp?${params.toString()}`;
 }
 

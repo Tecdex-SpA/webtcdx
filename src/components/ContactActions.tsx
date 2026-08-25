@@ -26,7 +26,7 @@ export function ContactActions({
 }: ContactActionsProps) {
   const pathname = usePathname();
   const contentId = contentIdFromPath(pathname ?? "/");
-  const whatsappUrl = getWhatsAppRedirectUrl(contentId, "direct", "body");
+  const whatsappUrl = getWhatsAppRedirectUrl(contentId, "body");
   const emailUrl = getEmailUrl(
     "Información sobre TECDEX Compliance",
     "Hola, me gustaría recibir más información sobre TECDEX Compliance."

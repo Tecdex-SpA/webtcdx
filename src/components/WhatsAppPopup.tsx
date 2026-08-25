@@ -25,7 +25,7 @@ export function WhatsAppPopup() {
       if (triggeredRef.current) return;
       triggeredRef.current = true;
       setVisible(true);
-      trackEvent("whatsapp_popup_open", { content_id: contentId, placement: "sticky" });
+      trackEvent("whatsapp_popup_shown", { content_id: contentId, placement: "popup_cta" });
     };
 
     const timer = window.setTimeout(trigger, SHOW_AFTER_MS);
@@ -49,7 +49,7 @@ export function WhatsAppPopup() {
   const handleClose = useCallback(() => {
     setVisible(false);
     window.sessionStorage.setItem(SESSION_KEY, "1");
-    trackEvent("whatsapp_popup_close", { content_id: contentId, placement: "sticky" });
+    trackEvent("whatsapp_popup_close", { content_id: contentId, placement: "popup_cta" });
   }, [contentId]);
 
   const handleCtaClick = useCallback(() => {
@@ -69,7 +69,7 @@ export function WhatsAppPopup() {
 
   if (!visible) return null;
 
-  const whatsappUrl = getWhatsAppRedirectUrl(contentId, "direct", "sticky");
+  const whatsappUrl = getWhatsAppRedirectUrl(contentId, "popup_cta");
 
   return (
     <div
@@ -97,7 +97,7 @@ export function WhatsAppPopup() {
         onClick={handleCtaClick}
         data-analytics-event="cta_click"
         data-content-id={contentId}
-        data-placement="sticky"
+        data-placement="popup_cta"
         className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
       >
         Escribir por WhatsApp

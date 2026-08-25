@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { contentIdFromPath, trackEvent } from "@/lib/analytics";
+import { applyWhatsAppAttribution, contentIdFromPath, trackEvent } from "@/lib/analytics";
 
 function inferPlacement(anchor: HTMLAnchorElement): string {
   if (anchor.dataset.placement) return anchor.dataset.placement;
@@ -49,6 +49,13 @@ function AnalyticsEffects({ measurementId }: { measurementId?: string }) {
   }, [measurementId, pathname, search]);
 
   useEffect(() => {
+    applyWhatsAppAttribution();
+    const observer = new MutationObserver(() => applyWhatsAppAttribution());
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [pathname, search]);
+
+  useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       const target = event.target instanceof Element ? event.target.closest("a") : null;
       if (!(target instanceof HTMLAnchorElement)) return;
@@ -59,6 +66,7 @@ function AnalyticsEffects({ measurementId }: { measurementId?: string }) {
       const declaredEvent = target.dataset.analyticsEvent;
 
       if (declaredEvent === "whatsapp_click" || target.pathname === "/go/whatsapp") {
+        applyWhatsAppAttribution();
         trackEvent("cta_click", {
           content_id: contentId,
           placement,

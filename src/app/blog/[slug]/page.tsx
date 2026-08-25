@@ -131,7 +131,7 @@ export default async function ArticlePage({ params }: PageProps) {
             <p className="mt-3 text-white/75">Plataforma GRC simple y trazable para organizar el trabajo de cumplimiento.</p>
             <a
               className="mt-5 inline-flex rounded-full bg-white px-5 py-3 font-semibold text-brand-navy"
-              href={`/go/whatsapp?content_id=${canonicalSlug}&source=organic&placement=body`}
+              href={`/go/whatsapp?content_id=${canonicalSlug}&placement=body`}
               data-analytics-event="cta_click"
               data-content-id={canonicalSlug}
               data-placement="body"
