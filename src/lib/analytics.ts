@@ -4,7 +4,7 @@ export type AnalyticsPayload = Record<string, string | number | boolean | undefi
 declare global {
   interface Window {
     dataLayer?: Array<Record<string, unknown>>;
-    gtag?: (command: "event", eventName: string, payload?: AnalyticsPayload) => void;
+    gtag?: (...args: unknown[]) => void;
   }
 }
 

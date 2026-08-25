@@ -17,16 +17,28 @@ function AnalyticsEffects() {
   const searchParams = useSearchParams();
   const search = searchParams.toString();
   const lastPageView = useRef<string | null>(null);
+  const initialPageViewSent = useRef(false);
 
   useEffect(() => {
     const pageLocation = window.location.href;
     if (lastPageView.current === pageLocation) return;
     lastPageView.current = pageLocation;
-    trackEvent("page_view", {
-      page_location: pageLocation,
-      page_title: document.title,
-      content_id: contentIdFromPath(pathname),
-    });
+    const contentId = contentIdFromPath(pathname);
+
+    if (!initialPageViewSent.current) {
+      initialPageViewSent.current = true;
+      trackEvent("page_view", {
+        page_location: pageLocation,
+        page_title: document.title,
+        content_id: contentId,
+      });
+      return;
+    }
+
+    // GA4 Enhanced Measurement emits one page_view for App Router history
+    // changes. Set route context before that event instead of emitting a
+    // second manual page_view.
+    window.gtag?.("set", { content_id: contentId });
   }, [pathname, search]);
 
   useEffect(() => {
