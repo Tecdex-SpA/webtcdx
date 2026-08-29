@@ -6,6 +6,9 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    // Los tests unitarios corren con el runner nativo de Node
+    // (`node --test`), que resuelve los imports con extensión `.ts` explícita.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { parseGaClientId, parseGaSessionId } from "@/lib/gaCookies";
 
 const WHATSAPP_NUMBER = "56989995290";
 const UNKNOWN_VALUE = "unknown";
@@ -182,33 +182,45 @@ function naturalMessage(contentId: string): string {
   return "Hola, me gustaría saber más sobre TECDEX Compliance.";
 }
 
-function cookieValue(request: Request, name: string): string | undefined {
-  const cookie = request.headers.get("cookie") || "";
-  return cookie
-    .split(";")
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${name}=`))
-    ?.slice(name.length + 1);
+// Bots, previsualizadores de enlaces y prefetchers siguen `/go/whatsapp` porque
+// es un <a href> normal. Nunca traen cookies de GA4, así que sin este filtro
+// cada crawl generaba un hit de Measurement Protocol sin sesión asociada.
+// `whatsapp` NO va en la lista: el navegador embebido de WhatsApp también lo
+// declara en su user agent y son visitas reales. El previsualizador de enlaces
+// de WhatsApp queda igualmente descartado porque no trae cookies de GA4.
+const BOT_USER_AGENT_PATTERN =
+  /bot|crawl|spider|slurp|preview|fetcher|monitor|scan|curl|wget|python-requests|headless|lighthouse|facebookexternalhit|telegram|discord|slack|embedly|vercel|uptime/i;
+
+// Contadores por instancia: permiten cuantificar en los logs cuántos clicks se
+// omiten y por qué, en lugar de descubrirlo semanas después en el informe.
+const skipCounters = {
+  no_client_id: 0,
+  no_session_id: 0,
+  bot: 0,
+};
+
+function isLikelyBot(request: Request): boolean {
+  const userAgent = request.headers.get("user-agent");
+  if (!userAgent) return true;
+  return BOT_USER_AGENT_PATTERN.test(userAgent);
 }
 
-function gaClientId(request: Request): string | undefined {
-  const value = cookieValue(request, "_ga");
-  if (!value) return undefined;
-  const match = value.match(/^GA\d+\.\d+\.(\d+\.\d+)$/);
-  return match?.[1];
-}
-
-function gaSessionId(request: Request, measurementId: string): number | undefined {
-  const suffix = measurementId.replace(/^G-/, "");
-  const value = cookieValue(request, `_ga_${suffix}`);
-  if (!value) return undefined;
-  const sessionId =
-    value.match(/^GS\d+\.\d+\.s(\d+)/)?.[1] ||
-    value.match(/\$s(\d+)/)?.[1] ||
-    value.match(/^GS\d+\.\d+\.(\d+)/)?.[1];
-  if (!sessionId) return undefined;
-  const parsed = Number(sessionId);
-  return Number.isSafeInteger(parsed) ? parsed : undefined;
+/**
+ * Página desde la que se hizo el click. El evento debe apuntar al artículo, no
+ * al endpoint de redirección, así que se usa el Referer y sólo si es propio.
+ */
+function pageLocation(request: Request): string | undefined {
+  const referer = request.headers.get("referer");
+  if (!referer) return undefined;
+  try {
+    const url = new URL(referer);
+    // Sólo se acepta un referer propio: evita inyectar URLs externas en el
+    // informe de páginas y funciona igual en preview y en producción.
+    if (url.hostname !== new URL(request.url).hostname) return undefined;
+    return url.toString();
+  } catch {
+    return undefined;
+  }
 }
 
 async function sendMeasurementEvent(request: Request, params: NormalizedParams): Promise<boolean> {
@@ -223,13 +235,40 @@ async function sendMeasurementEvent(request: Request, params: NormalizedParams):
     console.warn(`[analytics] whatsapp_click normalized parameters: ${params.invalidParams}.`);
   }
 
+  if (isLikelyBot(request)) {
+    skipCounters.bot += 1;
+    console.info(`[analytics] whatsapp_click skipped: automated user agent (count=${skipCounters.bot}).`);
+    return false;
+  }
+
+  const cookieHeader = request.headers.get("cookie");
+  const clientId = parseGaClientId(cookieHeader);
+  const sessionId = parseGaSessionId(cookieHeader, measurementId);
+
+  // Sin estos dos identificadores GA4 no puede unir el hit con la sesión del
+  // navegador: abriría una sesión nueva sin source/medium y el evento caería en
+  // "Unassigned". Fabricar un client_id (por ejemplo con randomUUID) es
+  // exactamente lo que producía ese ruido. Se prefiere perder el evento.
+  if (!clientId) {
+    skipCounters.no_client_id += 1;
+    console.warn(
+      `[analytics] whatsapp_click skipped: missing _ga cookie, cannot join GA4 session (count=${skipCounters.no_client_id}).`,
+    );
+    return false;
+  }
+  if (!sessionId) {
+    skipCounters.no_session_id += 1;
+    console.warn(
+      `[analytics] whatsapp_click skipped: missing _ga_<container> cookie, cannot join GA4 session (count=${skipCounters.no_session_id}).`,
+    );
+    return false;
+  }
+
   try {
-    const cookieClientId = gaClientId(request);
-    const clientId = cookieClientId || randomUUID();
-    const sessionId = gaSessionId(request, measurementId);
     const endpoint = new URL("https://www.google-analytics.com/mp/collect");
     endpoint.searchParams.set("measurement_id", measurementId);
     endpoint.searchParams.set("api_secret", apiSecret);
+    const location = pageLocation(request);
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -247,8 +286,12 @@ async function sendMeasurementEvent(request: Request, params: NormalizedParams):
               params_normalized: params.paramsNormalized ? "true" : "false",
               invalid_params: params.invalidParams,
               ...params.diagnostics,
-              engagement_time_msec: 1,
-              ...(sessionId ? { session_id: sessionId } : {}),
+              ...(location ? { page_location: location } : {}),
+              // `session_id` va DENTRO de params (no en la raíz del payload) y
+              // `engagement_time_msec` es obligatorio para que GA4 cuente el hit
+              // como interacción dentro de la sesión existente.
+              session_id: sessionId,
+              engagement_time_msec: "100",
             },
           },
         ],
@@ -259,15 +302,16 @@ async function sendMeasurementEvent(request: Request, params: NormalizedParams):
 
     if (!response.ok) {
       console.error(`[analytics] GA4 Measurement Protocol returned ${response.status}.`);
-    } else {
-      console.info(
-        `[analytics] whatsapp_click attribution context: client_id_source=${cookieClientId ? "ga_cookie" : "generated"}; session_id_forwarded=${sessionId ? "true" : "false"}.`,
-      );
-      if (params.paramsNormalized) {
-        console.info("[analytics] whatsapp_click with normalized parameters was sent.");
-      }
+      return false;
     }
-    return response.ok;
+
+    console.info(
+      `[analytics] whatsapp_click joined GA4 session; page_location=${location ? "referer" : "absent"}.`,
+    );
+    if (params.paramsNormalized) {
+      console.info("[analytics] whatsapp_click with normalized parameters was sent.");
+    }
+    return true;
   } catch {
     console.error("[analytics] Failed to send server-side whatsapp_click.");
     return false;
