@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --import ./scripts/test-setup.mjs --test \"src/**/*.test.ts\"",
+    "validate:mp": "node scripts/validate-mp-payload.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

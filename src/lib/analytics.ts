@@ -18,8 +18,11 @@ declare global {
 
 export function trackEvent(event: AnalyticsEvent, payload: AnalyticsPayload = {}): void {
   if (typeof window === "undefined") return;
-  // whatsapp_click is authoritative server-side in /go/whatsapp. Blocking it
-  // here prevents accidental client-side double counting.
+  // Vía única para whatsapp_click: Measurement Protocol desde /go/whatsapp.
+  // Se bloquea aquí para que nunca se cuente dos veces. Ese emisor omite el
+  // envío cuando no puede leer client_id y session_id de las cookies de GA4,
+  // así que un click sin cookies se pierde a propósito: es preferible a un
+  // evento sin atribución que acaba en el canal "Unassigned".
   if (event === "whatsapp_click") return;
   try {
     window.dataLayer = window.dataLayer || [];
