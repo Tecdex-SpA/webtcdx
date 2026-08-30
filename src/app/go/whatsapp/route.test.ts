@@ -46,6 +46,18 @@ function call(cookie?: string, userAgent: string = BROWSER_UA) {
   );
 }
 
+function callWithPlacement(placement: string) {
+  return GET(
+    new Request(`https://isos.tecdex.net/go/whatsapp?content_id=home&source=google&placement=${placement}`, {
+      headers: {
+        "user-agent": BROWSER_UA,
+        referer: REFERER,
+        cookie: `${CLIENT_COOKIE}; ${GS2_COOKIE}`,
+      },
+    }),
+  );
+}
+
 function eventParams(index = 0): Record<string, unknown> {
   const events = sent[index].body.events as Array<{ params: Record<string, unknown> }>;
   return events[0].params;
@@ -152,4 +164,69 @@ test("si el envío a GA4 falla, el usuario llega a WhatsApp igual", async () => 
   const response = await call(`${CLIENT_COOKIE}; ${GS2_COOKIE}`);
   assert.equal(response.status, 302);
   assert.match(response.headers.get("location") ?? "", /^https:\/\/wa\.me\//);
+});
+
+// --- site --------------------------------------------------------------------
+
+test("envía site='isos' para separar este emisor del snippet de tecdex.net", async () => {
+  await call(`${CLIENT_COOKIE}; ${GS2_COOKIE}`);
+
+  // Ambos hosts comparten measurement ID, así que `site` es lo único que los
+  // distingue en los informes.
+  assert.equal(eventParams().site, "isos");
+});
+
+test("site viaja en params del evento, no en la raíz del payload", async () => {
+  await call(`${CLIENT_COOKIE}; ${GS2_COOKIE}`);
+  assert.equal(sent[0].body.site, undefined);
+});
+
+// --- placement ---------------------------------------------------------------
+
+test("placement llega a GA4 y no se queda sólo en el query string", async () => {
+  await call(`${CLIENT_COOKIE}; ${GS2_COOKIE}`);
+  assert.equal(eventParams().placement, "sticky_bubble");
+});
+
+test("placement se traduce al vocabulario compartido con el WordPress", async () => {
+  const expected: Array<[string, string]> = [
+    ["popup_cta", "popup"],
+    ["hero", "header"],
+    ["body", "inline"],
+    ["related", "inline"],
+    ["footer", "footer"],
+    ["sticky", "sticky_bubble"],
+    ["sticky_bubble", "sticky_bubble"],
+  ];
+
+  for (const [input, canonical] of expected) {
+    sent = [];
+    await callWithPlacement(input);
+    assert.equal(sent.length, 1, `placement=${input} debía enviarse`);
+    assert.equal(eventParams().placement, canonical, `placement=${input}`);
+  }
+});
+
+test("todo placement enviado pertenece al vocabulario compartido", async () => {
+  const SHARED = new Set(["popup", "footer", "header", "cta_button", "inline", "sticky_bubble"]);
+
+  for (const input of ["popup_cta", "hero", "body", "related", "footer", "sticky", "sticky_bubble"]) {
+    sent = [];
+    await callWithPlacement(input);
+    assert.ok(SHARED.has(String(eventParams().placement)), `${input} produjo un valor fuera del vocabulario`);
+  }
+});
+
+test("placement desconocido no se inventa: se omite y se marca como normalizado", async () => {
+  await callWithPlacement("inventado");
+
+  assert.equal(sent.length, 1);
+  assert.equal(eventParams().placement, undefined);
+  assert.equal(eventParams().params_normalized, "true");
+  assert.match(String(eventParams().invalid_params), /placement/);
+});
+
+test("placement con otra caja se acepta y se traduce igual", async () => {
+  await callWithPlacement("POPUP_CTA");
+  assert.equal(eventParams().placement, "popup");
 });

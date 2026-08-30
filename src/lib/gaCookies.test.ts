@@ -98,6 +98,18 @@ test("session_id: measurement id vacío -> undefined", () => {
   assert.equal(parseGaSessionId(`${GA_COOKIE}=GS2.1.s1724678901$o3`, "G-"), undefined);
 });
 
+test("cookies con la forma real que sirve producción (verificado 2026-08-30)", () => {
+  // Capturado en el navegador sobre https://isos.tecdex.net: confirma que los
+  // nombres y formatos que espera el parser son los que gtag.js escribe de
+  // verdad, no una suposición.
+  const header =
+    "_ga_FCBC6HZ3M5=GS2.1.s1788128175$o1$g0$t1788128175$j60$l0$h41284443; " +
+    "_ga=GA1.1.1783008182.1788128176; _gcl_au=1.1.123.456";
+
+  assert.equal(parseGaClientId(header), "1783008182.1788128176");
+  assert.equal(parseGaSessionId(header, MEASUREMENT_ID), "1788128175");
+});
+
 // --- helper ------------------------------------------------------------------
 
 test("readCookieValues: devuelve todas las ocurrencias, no sólo la primera", () => {

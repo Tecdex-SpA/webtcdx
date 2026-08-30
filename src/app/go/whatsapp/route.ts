@@ -6,7 +6,27 @@ const DIAGNOSTIC_MAX_LENGTH = 50;
 const GA4_TIMEOUT_MS = 1500;
 
 const VALID_SOURCE_PATTERN = /^[a-z0-9][a-z0-9._-]{0,63}$/;
-const VALID_PLACEMENTS = new Set(["hero", "body", "footer", "sticky", "sticky_bubble", "popup_cta", "related"]);
+// Identifica al emisor dentro de la propiedad GA4: `isos` (este sitio) frente a
+// `tecdex_wp` (el snippet client-side de tecdex.net). Ambos hosts comparten el
+// measurement ID G-FCBC6HZ3M5, así que la dimensión "Nombre del stream" no los
+// separa y este parámetro es la única forma de distinguirlos en los informes.
+const SITE = "isos";
+
+// Los placements del sitio se traducen al vocabulario que ya usa el WordPress,
+// para que las lecturas sean comparables entre ambos emisores. Las claves son
+// los valores aceptados en el query string (no se cambian las URLs ni los
+// componentes); los valores son lo que se envía a GA4 en la dimensión
+// "Placement". Nota: `body` y `related` colapsan ambos en `inline`, así que esa
+// distinción sólo queda disponible vía `content_id`.
+const PLACEMENT_VOCABULARY = new Map([
+  ["hero", "header"],
+  ["body", "inline"],
+  ["related", "inline"],
+  ["footer", "footer"],
+  ["sticky", "sticky_bubble"],
+  ["sticky_bubble", "sticky_bubble"],
+  ["popup_cta", "popup"],
+]);
 const KNOWN_ARTICLE_SLUGS = new Set([
   "beneficios-gestion-centralizada-identidades",
   "gestion-evidencias-iso-27001-trazabilidad",
@@ -141,8 +161,12 @@ function normalizeRequest(url: URL): NormalizedParams {
   if (placementInput.present) {
     if (placementInput.valid && placementInput.value) {
       const lowered = placementInput.value.toLowerCase();
-      if (VALID_PLACEMENTS.has(lowered)) {
-        placement = lowered;
+      const canonical = PLACEMENT_VOCABULARY.get(lowered);
+      if (canonical) {
+        // La traducción al vocabulario compartido es deliberada del servidor, no
+        // un error del cliente: sólo se marca como normalizado si el valor venía
+        // con otra caja.
+        placement = canonical;
         if (placementInput.value !== lowered) markNormalized("placement", placementInput);
       } else {
         markNormalized("placement", placementInput);
@@ -278,6 +302,7 @@ async function sendMeasurementEvent(request: Request, params: NormalizedParams):
           {
             name: "whatsapp_click",
             params: {
+              site: SITE,
               content_id: params.contentId,
               source: params.source,
               medium: params.medium,
