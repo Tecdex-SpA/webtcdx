@@ -5,7 +5,6 @@ const UNKNOWN_VALUE = "unknown";
 const DIAGNOSTIC_MAX_LENGTH = 50;
 const GA4_TIMEOUT_MS = 1500;
 
-const VALID_SOURCE_PATTERN = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 // Identifica al emisor dentro de la propiedad GA4: `isos` (este sitio) frente a
 // `tecdex_wp` (el snippet client-side de tecdex.net). Ambos hosts comparten el
 // measurement ID G-FCBC6HZ3M5, así que la dimensión "Nombre del stream" no los
@@ -19,7 +18,7 @@ const SITE = "isos";
 // hosts la da el parámetro `site`, no un vocabulario común; ojo que `footer`
 // existe en ambos sitios y no significa lo mismo, así que toda lectura de
 // `placement` debe filtrar por `site` primero.
-const VALID_PLACEMENTS = new Set(["hero", "body", "footer", "sticky", "sticky_bubble", "popup_cta", "related"]);
+const VALID_PLACEMENTS = new Set(["sticky_bubble", "popup_cta", "hero", "body", "footer", "related"]);
 const KNOWN_ARTICLE_SLUGS = new Set([
   "beneficios-gestion-centralizada-identidades",
   "gestion-evidencias-iso-27001-trazabilidad",
@@ -50,7 +49,7 @@ const KNOWN_STATIC_CONTENT_IDS = new Set([
 const LEGACY_ARTICLE_SLUG = "migrar-planillas-tcdx-compliance";
 const MIGRATED_ARTICLE_SLUG = "migrar-planillas-a-plataforma-iso";
 
-type InputField = "content_id" | "source" | "medium" | "placement" | "campaign";
+type InputField = "content_id" | "placement";
 
 type ParsedInput = {
   present: boolean;
@@ -61,10 +60,7 @@ type ParsedInput = {
 
 type NormalizedParams = {
   contentId: string;
-  source: string;
-  medium?: string;
   placement?: string;
-  campaign?: string;
   paramsNormalized: boolean;
   invalidParams: string;
   diagnostics: Record<string, string>;
@@ -96,10 +92,7 @@ function parseInput(value: string | null, maxLength: number): ParsedInput {
 
 function normalizeRequest(url: URL): NormalizedParams {
   const contentInput = parseInput(url.searchParams.get("content_id"), 160);
-  const sourceInput = parseInput(url.searchParams.get("source"), 64);
-  const mediumInput = parseInput(url.searchParams.get("medium"), 64);
   const placementInput = parseInput(url.searchParams.get("placement"), 32);
-  const campaignInput = parseInput(url.searchParams.get("campaign"), 160);
   const normalizedFields = new Set<InputField>();
   const diagnostics: Record<string, string> = {};
 
@@ -122,34 +115,6 @@ function normalizeRequest(url: URL): NormalizedParams {
     markNormalized("content_id", contentInput);
   }
 
-  let source = UNKNOWN_VALUE;
-  if (sourceInput.valid && sourceInput.value) {
-    const lowered = sourceInput.value.toLowerCase();
-    if (VALID_SOURCE_PATTERN.test(lowered)) {
-      source = lowered;
-      if (sourceInput.value !== lowered) markNormalized("source", sourceInput);
-    } else {
-      markNormalized("source", sourceInput);
-    }
-  } else {
-    markNormalized("source", sourceInput);
-  }
-
-  let medium: string | undefined;
-  if (mediumInput.present) {
-    if (mediumInput.valid && mediumInput.value) {
-      const lowered = mediumInput.value.toLowerCase();
-      if (VALID_SOURCE_PATTERN.test(lowered)) {
-        medium = lowered;
-        if (mediumInput.value !== lowered) markNormalized("medium", mediumInput);
-      } else {
-        markNormalized("medium", mediumInput);
-      }
-    } else {
-      markNormalized("medium", mediumInput);
-    }
-  }
-
   let placement: string | undefined;
   if (placementInput.present) {
     if (placementInput.valid && placementInput.value) {
@@ -165,22 +130,10 @@ function normalizeRequest(url: URL): NormalizedParams {
     }
   }
 
-  let campaign: string | undefined;
-  if (campaignInput.present) {
-    if (campaignInput.valid && campaignInput.value) {
-      campaign = campaignInput.value;
-    } else {
-      markNormalized("campaign", campaignInput);
-    }
-  }
-
   const invalidParams = Array.from(normalizedFields).join(",") || "none";
   return {
     contentId,
-    source,
-    medium,
     placement,
-    campaign,
     paramsNormalized: normalizedFields.size > 0,
     invalidParams,
     diagnostics,
@@ -293,13 +246,25 @@ async function sendMeasurementEvent(request: Request, params: NormalizedParams):
             params: {
               site: SITE,
               content_id: params.contentId,
-              source: params.source,
-              medium: params.medium,
               placement: params.placement,
-              campaign: params.campaign,
-              params_normalized: params.paramsNormalized ? "true" : "false",
-              invalid_params: params.invalidParams,
-              ...params.diagnostics,
+              // `source`, `medium` y `campaign` NO viajan aquí. En Measurement
+              // Protocol son campos de atribución de tráfico reservados: GA4 los
+              // interpreta como el origen del evento y sobrescriben la
+              // atribución que el evento debe heredar de la sesión. Lo que
+              // enviábamos era exactamente eso —utm_* o el hostname del
+              // referrer, calculado en el cliente—, así que duplicaba y
+              // corrompía lo que la sesión ya resuelve.
+              //
+              // El bloque de diagnóstico sólo viaja cuando hay algo que
+              // reportar: un evento sano no lleva `invalid_params` ni
+              // `params_normalized`.
+              ...(params.paramsNormalized
+                ? {
+                    params_normalized: "true",
+                    invalid_params: params.invalidParams,
+                    ...params.diagnostics,
+                  }
+                : {}),
               ...(location ? { page_location: location } : {}),
               // `session_id` va DENTRO de params (no en la raíz del payload) y
               // `engagement_time_msec` es obligatorio para que GA4 cuente el hit
