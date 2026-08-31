@@ -12,21 +12,14 @@ const VALID_SOURCE_PATTERN = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 // separa y este parámetro es la única forma de distinguirlos en los informes.
 const SITE = "isos";
 
-// Los placements del sitio se traducen al vocabulario que ya usa el WordPress,
-// para que las lecturas sean comparables entre ambos emisores. Las claves son
-// los valores aceptados en el query string (no se cambian las URLs ni los
-// componentes); los valores son lo que se envía a GA4 en la dimensión
-// "Placement". Nota: `body` y `related` colapsan ambos en `inline`, así que esa
-// distinción sólo queda disponible vía `content_id`.
-const PLACEMENT_VOCABULARY = new Map([
-  ["hero", "header"],
-  ["body", "inline"],
-  ["related", "inline"],
-  ["footer", "footer"],
-  ["sticky", "sticky_bubble"],
-  ["sticky_bubble", "sticky_bubble"],
-  ["popup_cta", "popup"],
-]);
+// Vocabulario canónico de placements de isos. Se emite a GA4 tal cual, sin
+// traducir al vocabulario del snippet de tecdex.net: `body` (CTA dentro del
+// artículo) y `related` (bloque del final) son momentos distintos del funnel y
+// fusionarlos haría imposible comparar su conversión. La comparabilidad entre
+// hosts la da el parámetro `site`, no un vocabulario común; ojo que `footer`
+// existe en ambos sitios y no significa lo mismo, así que toda lectura de
+// `placement` debe filtrar por `site` primero.
+const VALID_PLACEMENTS = new Set(["hero", "body", "footer", "sticky", "sticky_bubble", "popup_cta", "related"]);
 const KNOWN_ARTICLE_SLUGS = new Set([
   "beneficios-gestion-centralizada-identidades",
   "gestion-evidencias-iso-27001-trazabilidad",
@@ -161,12 +154,8 @@ function normalizeRequest(url: URL): NormalizedParams {
   if (placementInput.present) {
     if (placementInput.valid && placementInput.value) {
       const lowered = placementInput.value.toLowerCase();
-      const canonical = PLACEMENT_VOCABULARY.get(lowered);
-      if (canonical) {
-        // La traducción al vocabulario compartido es deliberada del servidor, no
-        // un error del cliente: sólo se marca como normalizado si el valor venía
-        // con otra caja.
-        placement = canonical;
+      if (VALID_PLACEMENTS.has(lowered)) {
+        placement = lowered;
         if (placementInput.value !== lowered) markNormalized("placement", placementInput);
       } else {
         markNormalized("placement", placementInput);

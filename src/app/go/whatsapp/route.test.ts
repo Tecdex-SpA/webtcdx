@@ -188,32 +188,39 @@ test("placement llega a GA4 y no se queda sólo en el query string", async () =>
   assert.equal(eventParams().placement, "sticky_bubble");
 });
 
-test("placement se traduce al vocabulario compartido con el WordPress", async () => {
-  const expected: Array<[string, string]> = [
-    ["popup_cta", "popup"],
-    ["hero", "header"],
-    ["body", "inline"],
-    ["related", "inline"],
-    ["footer", "footer"],
-    ["sticky", "sticky_bubble"],
-    ["sticky_bubble", "sticky_bubble"],
-  ];
-
-  for (const [input, canonical] of expected) {
-    sent = [];
-    await callWithPlacement(input);
-    assert.equal(sent.length, 1, `placement=${input} debía enviarse`);
-    assert.equal(eventParams().placement, canonical, `placement=${input}`);
-  }
-});
-
-test("todo placement enviado pertenece al vocabulario compartido", async () => {
-  const SHARED = new Set(["popup", "footer", "header", "cta_button", "inline", "sticky_bubble"]);
-
+test("placement llega a GA4 sin traducir: cada valor sale tal como lo emite el sitio", async () => {
   for (const input of ["popup_cta", "hero", "body", "related", "footer", "sticky", "sticky_bubble"]) {
     sent = [];
     await callWithPlacement(input);
-    assert.ok(SHARED.has(String(eventParams().placement)), `${input} produjo un valor fuera del vocabulario`);
+    assert.equal(sent.length, 1, `placement=${input} debía enviarse`);
+    assert.equal(eventParams().placement, input, `placement=${input} no debe traducirse`);
+  }
+});
+
+// Regresión de b6c7321: `body` y `related` se traducían ambos a `inline`, lo que
+// fusionaba dos momentos distintos del funnel (CTA dentro del artículo vs.
+// bloque del final) de forma irrecuperable. Deben seguir siendo distinguibles.
+test("body y related son valores distintos y no colapsan en uno solo", async () => {
+  sent = [];
+  await callWithPlacement("body");
+  const body = eventParams().placement;
+
+  sent = [];
+  await callWithPlacement("related");
+  const related = eventParams().placement;
+
+  assert.equal(body, "body");
+  assert.equal(related, "related");
+  assert.notEqual(body, related);
+});
+
+test("todo placement enviado pertenece al vocabulario canónico de isos", async () => {
+  const ISOS = new Set(["sticky_bubble", "popup_cta", "hero", "body", "footer", "related"]);
+
+  for (const input of ["popup_cta", "hero", "body", "related", "footer", "sticky_bubble"]) {
+    sent = [];
+    await callWithPlacement(input);
+    assert.ok(ISOS.has(String(eventParams().placement)), `${input} produjo un valor fuera del vocabulario`);
   }
 });
 
@@ -226,7 +233,7 @@ test("placement desconocido no se inventa: se omite y se marca como normalizado"
   assert.match(String(eventParams().invalid_params), /placement/);
 });
 
-test("placement con otra caja se acepta y se traduce igual", async () => {
+test("placement con otra caja se acepta y se normaliza a minúsculas", async () => {
   await callWithPlacement("POPUP_CTA");
-  assert.equal(eventParams().placement, "popup");
+  assert.equal(eventParams().placement, "popup_cta");
 });
