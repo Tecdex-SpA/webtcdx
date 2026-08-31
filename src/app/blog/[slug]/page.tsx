@@ -10,6 +10,7 @@ import {
   getAllBlogPosts,
   getBlogPost,
   plainText,
+  relatedPosts,
   rewriteCanonicalArticleLinks,
 } from "@/lib/wordpress";
 
@@ -60,7 +61,7 @@ export default async function ArticlePage({ params }: PageProps) {
   const index = posts.findIndex((candidate) => candidate.id === post.id);
   const previous = index >= 0 ? posts[index + 1] : undefined;
   const next = index > 0 ? posts[index - 1] : undefined;
-  const related = posts.filter((candidate) => candidate.id !== post.id).slice(0, 3);
+  const related = relatedPosts(post, posts);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -139,6 +140,7 @@ export default async function ArticlePage({ params }: PageProps) {
               Consultar por WhatsApp
             </a>
           </aside>
+          {related.length > 0 ? (
           <section className="mx-auto mt-12 max-w-4xl" aria-labelledby="related-title">
             <h2 id="related-title" className="text-2xl font-bold text-brand-slate">Artículos relacionados</h2>
             <ul className="mt-5 grid gap-4 sm:grid-cols-3">
@@ -151,6 +153,7 @@ export default async function ArticlePage({ params }: PageProps) {
               ))}
             </ul>
           </section>
+          ) : null}
           <nav aria-label="Artículo anterior y siguiente" className="mx-auto mt-10 flex max-w-4xl justify-between gap-6 border-t border-brand-line pt-7 text-sm font-semibold">
             {previous ? <Link href={`/blog/${canonicalBlogSlug(previous.slug)}`}>← {decodeHtml(previous.title.rendered)}</Link> : <span />}
             {next ? <Link className="text-right" href={`/blog/${canonicalBlogSlug(next.slug)}`}>{decodeHtml(next.title.rendered)} →</Link> : <span />}

@@ -96,6 +96,81 @@ export function featuredImage(post: WpPost) {
   return post._embedded?.["wp:featuredmedia"]?.[0] ?? null;
 }
 
+// --- Artículos relacionados ---------------------------------------------------
+// WordPress no expone nada que sirva para relacionar estos posts: los 16 están
+// en la misma categoría (103) y ninguno tiene etiquetas. La relación se calcula
+// entonces sobre el texto que sí hay —título, slug canónico y extracto— con
+// pesado IDF: un término compartido pesa tanto menos cuanto más común sea en el
+// corpus, así que "iso" (presente en casi todos) no relaciona nada y "9001",
+// "pentesting" o "identidades" sí.
+//
+// Es determinista: mismo corpus, mismo resultado entre builds. El desempate por
+// slug evita que dos candidatos con idéntica puntuación se alternen.
+//
+// No hay relleno: si un artículo no alcanza tres candidatos con solapamiento
+// real, se muestran menos. Rellenar con los primeros del listado era justo el
+// bug que esto reemplaza.
+const RELATED_COUNT = 3;
+
+const RELATED_STOPWORDS = new Set(
+  ("de la el los las un una y o e u en para con por a al del que se su sus lo como que cual " +
+    "cuales sin sobre ante tras entre es son ser esta este estas estos si no mas ya tu tus " +
+    "cuando donde cada todo toda").split(" "),
+);
+
+function relatedTokens(text: string): string[] {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token.length > 2 && !RELATED_STOPWORDS.has(token));
+}
+
+function postTerms(post: WpPost): Set<string> {
+  return new Set([
+    ...relatedTokens(plainText(post.title.rendered)),
+    ...relatedTokens(canonicalBlogSlug(post.slug).replace(/-/g, " ")),
+    ...relatedTokens(plainText(post.excerpt.rendered)),
+  ]);
+}
+
+export function relatedPosts(post: WpPost, posts: WpPost[], limit: number = RELATED_COUNT): WpPost[] {
+  const corpus = posts.filter((candidate) => candidate.id !== post.id);
+  if (corpus.length === 0) return [];
+
+  const terms = new Map<number, Set<string>>();
+  for (const candidate of [post, ...corpus]) terms.set(candidate.id, postTerms(candidate));
+
+  const documentFrequency = new Map<string, number>();
+  terms.forEach((set) => {
+    set.forEach((term) => documentFrequency.set(term, (documentFrequency.get(term) ?? 0) + 1));
+  });
+
+  const total = terms.size;
+  const own = terms.get(post.id) ?? new Set<string>();
+
+  return corpus
+    .map((candidate) => {
+      let score = 0;
+      terms.get(candidate.id)?.forEach((term) => {
+        if (!own.has(term)) return;
+        score += Math.log(total / (documentFrequency.get(term) ?? total));
+      });
+      return { post: candidate, score };
+    })
+    // Solapamiento real: un candidato que sólo comparte términos presentes en
+    // todo el corpus puntúa 0 y no entra.
+    .filter((candidate) => candidate.score > 0)
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        canonicalBlogSlug(a.post.slug).localeCompare(canonicalBlogSlug(b.post.slug)),
+    )
+    .slice(0, limit)
+    .map((candidate) => candidate.post);
+}
+
 export function rewriteCanonicalArticleLinks(html: string, posts: WpPost[]): string {
   const knownSlugs = new Set(posts.map((post) => post.slug));
 
