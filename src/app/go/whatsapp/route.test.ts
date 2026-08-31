@@ -48,7 +48,7 @@ function call(cookie?: string, userAgent: string = BROWSER_UA) {
 
 function callWithPlacement(placement: string) {
   return GET(
-    new Request(`https://isos.tecdex.net/go/whatsapp?content_id=home&source=google&placement=${placement}`, {
+    new Request(`https://isos.tecdex.net/go/whatsapp?content_id=home&placement=${placement}`, {
       headers: {
         "user-agent": BROWSER_UA,
         referer: REFERER,
@@ -92,6 +92,54 @@ test("no añade parámetros de campaña: la atribución la hereda de la sesión"
   }
   // Tampoco timestamp_micros: evita la ventana de descarte de 72 h.
   assert.equal(sent[0].body.timestamp_micros, undefined);
+});
+
+// Regresión: el test de arriba sólo cubría la forma prefijada (`campaign_*`),
+// pero en Measurement Protocol los campos de atribución reservados son
+// `source`, `medium` y `campaign` SIN prefijo. Ésos son los que sobrescriben la
+// atribución de la sesión, y son justo los que el payload enviaba.
+test("source, medium y campaign nunca viajan en el payload aunque vengan en la URL", async () => {
+  await GET(
+    new Request(
+      "https://isos.tecdex.net/go/whatsapp?content_id=home&placement=body" +
+        "&source=google&medium=organic&campaign=primavera",
+      {
+        headers: {
+          "user-agent": BROWSER_UA,
+          referer: REFERER,
+          cookie: `${CLIENT_COOKIE}; ${GS2_COOKIE}`,
+        },
+      },
+    ),
+  );
+
+  const params = eventParams();
+  for (const reserved of ["source", "medium", "campaign"]) {
+    assert.equal(params[reserved], undefined, `${reserved} no debe enviarse a GA4`);
+  }
+  // El resto del evento sigue intacto.
+  assert.equal(params.placement, "body");
+  assert.equal(params.site, "isos");
+});
+
+test("un evento sano no lleva invalid_params ni params_normalized", async () => {
+  await callWithPlacement("body");
+
+  const params = eventParams();
+  assert.equal(params.invalid_params, undefined);
+  assert.equal(params.params_normalized, undefined);
+  assert.ok(
+    Object.keys(params).every((k) => !k.startsWith("original_")),
+    "un evento sano no lleva diagnósticos original_*",
+  );
+});
+
+test("el bloque de diagnóstico sí viaja cuando hay algo que reportar", async () => {
+  await callWithPlacement("inventado");
+
+  const params = eventParams();
+  assert.equal(params.params_normalized, "true");
+  assert.match(String(params.invalid_params), /placement/);
 });
 
 test("page_location apunta al artículo (Referer propio), no al endpoint de redirección", async () => {
@@ -189,7 +237,7 @@ test("placement llega a GA4 y no se queda sólo en el query string", async () =>
 });
 
 test("placement llega a GA4 sin traducir: cada valor sale tal como lo emite el sitio", async () => {
-  for (const input of ["popup_cta", "hero", "body", "related", "footer", "sticky", "sticky_bubble"]) {
+  for (const input of ["popup_cta", "hero", "body", "related", "footer", "sticky_bubble"]) {
     sent = [];
     await callWithPlacement(input);
     assert.equal(sent.length, 1, `placement=${input} debía enviarse`);
@@ -222,6 +270,15 @@ test("todo placement enviado pertenece al vocabulario canónico de isos", async 
     await callWithPlacement(input);
     assert.ok(ISOS.has(String(eventParams().placement)), `${input} produjo un valor fuera del vocabulario`);
   }
+});
+
+// `sticky` sin sufijo no pertenece al vocabulario canónico de isos: si algún
+// componente vuelve a emitirlo, el emisor debe delatarlo en vez de aceptarlo.
+test("sticky sin sufijo se rechaza: el valor canónico es sticky_bubble", async () => {
+  await callWithPlacement("sticky");
+
+  assert.equal(eventParams().placement, undefined);
+  assert.match(String(eventParams().invalid_params), /placement/);
 });
 
 test("placement desconocido no se inventa: se omite y se marca como normalizado", async () => {
