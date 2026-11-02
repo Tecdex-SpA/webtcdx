@@ -31,10 +31,10 @@ export function NormativeLanding() {
       </div>
     </header>
     <section id="top" className="relative overflow-hidden bg-[#2B3944] py-20 text-white md:py-28">
-      <div className="section-shell relative grid items-center gap-12 lg:grid-cols-2">
-        <div>
+      <div className="section-shell relative grid items-center gap-12 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-14">
+        <div className="min-w-0">
           <p className="mb-5 inline-block rounded-full border border-white/25 px-4 py-2 text-sm text-white/85">Gestión ISO para equipos que quieren avanzar</p>
-          <h1 className="max-w-2xl text-5xl font-bold leading-[1.06] tracking-tight md:text-6xl">Tu sistema ISO, claro y en movimiento.</h1>
+          <h1 className="max-w-[640px] font-bold">Tu sistema ISO, claro y en movimiento.</h1>
           <p className="mt-6 text-xl leading-8 text-white/85">Implementa, mantén y mejora ISO 9001 y/o ISO/IEC 27001 desde una plataforma que conecta requisitos, responsables, evidencias y acciones.</p>
           <div className="mt-9 flex flex-wrap gap-4">
             <a href="#planes" className="inline-flex min-h-12 items-center gap-2 rounded-[15px] bg-[#2F7774] px-7 py-3 font-semibold text-white">Ver planes y precios <ArrowRight size={18}/></a>
