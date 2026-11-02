@@ -73,8 +73,8 @@ export function NormativeLanding() {
         <p className="text-sm font-bold uppercase tracking-wider text-[#2F7774]">{plan.name}</p><h3 className="mt-3 text-4xl font-bold">{plan.price} UF <span className="text-base font-medium text-[#54595F]">+ IVA / mes</span></h3>
         <p className="mt-5 text-xl font-semibold">{plan.norms}</p><p className="mt-2 text-[#54595F]">{plan.detail}</p>
         <ul className="mt-7 space-y-3 text-sm">{["Hasta 1 sucursal","Hasta 3 áreas","Hasta 10 usuarios","Habilitación autoservicio sin costo","Acompañamiento opcional según cotización"].map(item=><li key={item} className="flex gap-3"><CheckCircle2 size={18} className="shrink-0 text-[#2F7774]"/>{item}</li>)}</ul>
-        <a href="#contacto" className="mt-8 inline-flex min-h-12 items-center justify-center rounded-[15px] bg-[#2F7774] px-6 py-3 font-bold text-white">{plan.cta} <ArrowRight className="ml-2" size={18}/></a>
-        <p className="mt-3 text-center text-xs text-[#54595F]">Contratación asistida por el equipo comercial.</p>
+        <a href="https://iso.tecdex.net/crear-cuenta" className="mt-8 inline-flex min-h-12 items-center justify-center rounded-[15px] bg-[#2F7774] px-6 py-3 font-bold text-white">{plan.cta} <ArrowRight className="ml-2" size={18}/></a>
+        <p className="mt-3 text-center text-xs text-[#54595F]">Crea tu cuenta para comenzar con Tecdex ISO.</p>
       </article>)}</div>
       <div className="mt-8 rounded-2xl bg-[#2B3944] p-8 text-white md:flex md:items-center md:justify-between md:gap-8"><div><h3 className="text-2xl font-bold">¿Necesitas más capacidad?</h3><p className="mt-3 text-white/80">Conoce Credex GRC con asesoría de nuestro equipo.</p></div><a href="#contacto" className="mt-5 inline-flex min-h-12 shrink-0 items-center rounded-[15px] border border-white/50 px-6 py-3 font-semibold md:mt-0">Hablar con un asesor</a></div>
     </div></section>
