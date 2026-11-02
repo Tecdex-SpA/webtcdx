@@ -162,10 +162,11 @@ header .section-shell > a:last-child:hover,
 }
 
 #top h1 {
-  max-width: 780px;
-  font-size: clamp(3.5rem, 8vw, 6.6rem);
-  line-height: 0.92;
-  letter-spacing: -0.06em;
+  max-width: 640px;
+  font-size: clamp(2.75rem, 4.5vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
 #top h1 + p {
@@ -382,9 +383,9 @@ footer {
   }
 
   #top h1 {
-    font-size: clamp(2.65rem, 13vw, 4rem);
-    line-height: 0.95;
-    letter-spacing: -0.055em;
+    font-size: clamp(2.45rem, 8.5vw, 3.6rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
   }
 
   #top h1 + p {
@@ -437,6 +438,6 @@ footer {
   }
 
   #top h1 {
-    font-size: clamp(2.35rem, 12vw, 3rem);
+    font-size: clamp(2.3rem, 9vw, 3rem);
   }
 }
