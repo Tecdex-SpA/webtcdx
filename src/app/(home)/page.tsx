@@ -10,7 +10,7 @@ const homeJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "@id": "https://isos.tecdex.net/#software",
-  name: "TECDEX Compliance",
+  name: "Tecdex ISO",
   url: "https://isos.tecdex.net/",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
