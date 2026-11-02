@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { ArrowRight, CheckCircle2, ClipboardCheck, FileCheck2, ListChecks, ShieldCheck, Target, TriangleAlert } from "lucide-react";
 import { ContactActions } from "@/components/ContactActions";
 import { EmbeddedModeController } from "@/components/EmbeddedModeController";
@@ -22,7 +23,7 @@ export function NormativeLanding() {
     <Suspense fallback={null}><EmbeddedModeController /></Suspense>
     <header data-embedded-chrome className="sticky top-0 z-50 border-b border-white/15 bg-[#2B3944] text-white">
       <div className="section-shell flex min-h-[76px] items-center justify-between gap-4">
-        <a href="/" className="font-bold tracking-wide text-white" aria-label="Tecdex ISO">Tecdex ISO</a>
+        <Link href="/" className="font-bold tracking-wide text-white" aria-label="Tecdex ISO">Tecdex ISO</Link>
         <nav className="hidden gap-7 text-sm md:flex" aria-label="Navegación principal">
           <a href="#solucion">Plataforma</a><a href="#planes">Planes</a><a href="#preguntas">Preguntas frecuentes</a>
         </nav>
@@ -85,6 +86,6 @@ export function NormativeLanding() {
       ["¿Puedo solicitar ayuda en la habilitación?", "Sí. La habilitación por autoservicio no tiene costo; el acompañamiento se cotiza según el alcance."],
     ].map(([q,a])=><article key={q} className="rounded-xl border border-[#D8D8D8] p-6"><h3 className="font-bold">{q}</h3><p className="mt-3 leading-7 text-[#54595F]">{a}</p></article>)}</div></div></section>
     <section id="contacto" className="bg-[#2B3944] py-20 text-white"><div className="section-shell grid gap-10 lg:grid-cols-2"><div><p className="text-sm font-bold uppercase tracking-widest text-[#a7e1de]">Comienza esta semana</p><h2 className="mt-3 text-4xl font-bold">Conversemos sobre tu norma.</h2><p className="mt-5 text-lg leading-8 text-white/80">Cuéntanos si necesitas ISO 9001, ISO/IEC 27001 o ambas. Nuestro equipo te orientará para comenzar con el plan adecuado.</p></div><ContactActions /></div></section>
-    <footer data-embedded-chrome className="bg-[#22303a] py-10 text-white"><div className="section-shell flex flex-col justify-between gap-5 text-sm md:flex-row"><div><strong>Tecdex ISO</strong><p className="mt-2 text-white/70">Plataforma SaaS desarrollada por TECDEX SpA.</p></div><div className="flex flex-wrap gap-5"><a href="https://iso.tecdex.net/login">Ingresar</a><a href="mailto:contacto@tecdex.net">Contacto</a><a href="/politica-privacidad">Política de privacidad</a></div></div></footer>
+    <footer data-embedded-chrome className="bg-[#22303a] py-10 text-white"><div className="section-shell flex flex-col justify-between gap-5 text-sm md:flex-row"><div><strong>Tecdex ISO</strong><p className="mt-2 text-white/70">Plataforma SaaS desarrollada por TECDEX SpA.</p></div><div className="flex flex-wrap gap-5"><a href="https://iso.tecdex.net/login">Ingresar</a><a href="mailto:contacto@tecdex.net">Contacto</a><Link href="/politica-privacidad">Política de privacidad</Link></div></div></footer>
   </main>;
 }
