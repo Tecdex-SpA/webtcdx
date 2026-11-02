@@ -14,11 +14,11 @@ const validGa4MeasurementId =
 export const metadata: Metadata = {
   metadataBase: new URL("https://isos.tecdex.net"),
   title: {
-    default: "TECDEX Compliance | Plataforma GRC simple y trazable",
-    template: "%s | TECDEX Compliance",
+    default: "Tecdex ISO | Plataforma para gestionar ISO 9001 e ISO/IEC 27001",
+    template: "%s | Tecdex ISO",
   },
   description:
-    "Plataforma GRC simple y trazable para organizar controles, evidencias, riesgos, auditorías y acciones.",
+    "Plataforma para gestionar ISO 9001 e ISO/IEC 27001 para organizar controles, evidencias, riesgos, auditorías y acciones.",
   authors: [{ name: "TECDEX" }],
   creator: "TECDEX",
   publisher: "TECDEX",
@@ -39,17 +39,17 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "TECDEX Compliance | Plataforma GRC simple y trazable",
-    description: "Plataforma GRC simple y trazable desarrollada por TECDEX.",
-    siteName: "TECDEX Compliance",
+    title: "Tecdex ISO | Plataforma para gestionar ISO 9001 e ISO/IEC 27001",
+    description: "Plataforma para gestionar ISO 9001 e ISO/IEC 27001 desarrollada por TECDEX.",
+    siteName: "Tecdex ISO",
     type: "website",
     locale: "es_CL",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "TECDEX Compliance" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Tecdex ISO" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TECDEX Compliance | Plataforma GRC simple y trazable",
-    description: "Plataforma GRC simple y trazable desarrollada por TECDEX.",
+    title: "Tecdex ISO | Plataforma para gestionar ISO 9001 e ISO/IEC 27001",
+    description: "Plataforma para gestionar ISO 9001 e ISO/IEC 27001 desarrollada por TECDEX.",
     images: ["/opengraph-image"],
   },
 };
@@ -67,7 +67,7 @@ const globalJsonLd = {
       "@type": "WebSite",
       "@id": "https://isos.tecdex.net/#website",
       url: "https://isos.tecdex.net/",
-      name: "TECDEX Compliance",
+      name: "Tecdex ISO",
       publisher: { "@id": "https://tecdex.net/#organization" },
     },
   ],
